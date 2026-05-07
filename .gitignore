@@ -22,9 +22,8 @@ keystore.*.local.properties
 .env.*
 google-services.json
 
-# release フォルダは手元専用（upload.jks 等）。説明テキストだけリポジトリに含める。
-release/*
-!release/README_LOCAL_SIGNING.txt
+# ローカル用フォルダ（キーストアの保管など）。リポジトリには含めない。
+release/
 
 # ルートや作業用に置いた配布物
 /*.apk
