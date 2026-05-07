@@ -1,23 +1,41 @@
-# Gradle
+# --- Gradle / Kotlin ---
 .gradle/
-build/
+.kotlin/
+local.properties
+
+# ビルド成果物（どの階層も）
+**/build/
 !gradle/wrapper/gradle-wrapper.jar
 
-# Android / AGP
-**/build/
-**/local.properties
+# Android / NDK
 **/captures/
 .externalNativeBuild/
 .cxx/
 
-# IDE
+# --- 秘密情報・署名（GitHub に上げたらアウト）---
+keystore.properties
+*.jks
+*.keystore
+*.pem
+.env
+.env.*
+
+# release フォルダは手元専用（upload.jks 等）。説明テキストだけリポジトリに含める。
+release/*
+!release/README_LOCAL_SIGNING.txt
+
+# ルートや作業用に置いた配布物
+/*.apk
+/*.aab
+
+# --- IDE / OS ---
 .idea/
 *.iml
 .DS_Store
+Thumbs.db
+Desktop.ini
+.cursor/
 
-# Kotlin
-.kotlin/
-
-# Logs & debug artifacts
+# --- ログ・デバッグ ---
 *.log
 *.hprof
