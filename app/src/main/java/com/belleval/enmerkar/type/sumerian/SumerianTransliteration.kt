@@ -8,6 +8,7 @@ package com.belleval.enmerkar.type.sumerian
  * **曖昧さ**: `lu` は `lugal` 等の接頭辞でもあるため、貪欲確定は文字を区切ってから行う。
  * **ラテン文字の入力中は楔形に変換しない**。スペース・句読点・改行・（記号ページの）記号キーや、
  * 楔形グリッドで符号を選ぶ直前に、未変換バッファを貪欲分割して確定する。
+ * **ハイフン `-`**: バッファにそのまま挿入。確定時に **音節境界** としてセグメント分割する（例: `ma-e`）。
  */
 object SumerianTransliteration {
     val readingToCodepoint: Map<String, Int> by lazy {

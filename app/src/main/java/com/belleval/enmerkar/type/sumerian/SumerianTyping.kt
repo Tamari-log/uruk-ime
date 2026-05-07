@@ -4,13 +4,51 @@ private fun glyphFor(cp: Int): String = String(Character.toChars(cp))
 
 /**
  * ラテン転写だけ [buffer] に足す。楔形への変換は [flushGreedy] 等の確定処理でのみ行う。
+ * **-** は音節境界（確定時にセグメント分割）。
  */
 internal fun appendLatinRaw(buffer: StringBuilder, ch: Char) {
     when {
         ch.lowercaseChar() in 'a'..'z' -> buffer.append(ch.lowercaseChar())
         ch == '\'' -> buffer.append('\'')
+        ch == '-' -> buffer.append('-')
         else -> Unit
     }
+}
+
+/**
+ * バッファを **-** で区切った各セグメントごとに貪欲分割し、楔形の文字列リストにする。
+ * 例: `ma-e` → `ma` と `e` を別音節として変換（`mae` のような一続きの読みと区別）。
+ */
+internal fun flushGreedy(dict: Map<String, Int>, buffer: StringBuilder): List<String> {
+    val text = buffer.toString()
+    buffer.clear()
+    if (text.isEmpty()) return emptyList()
+    val out = mutableListOf<String>()
+    for (part in text.split('-')) {
+        if (part.isEmpty()) continue
+        val seg = StringBuilder(part)
+        out.addAll(flushGreedySingleSegment(dict, seg))
+    }
+    return out
+}
+
+private fun flushGreedySingleSegment(
+    dict: Map<String, Int>,
+    buffer: StringBuilder,
+): List<String> {
+    val out = mutableListOf<String>()
+    while (buffer.isNotEmpty()) {
+        val b = buffer.toString()
+        val m = dict.keys.filter { b.startsWith(it) }.maxByOrNull { it.length }
+        if (m == null) {
+            out.add(buffer[0].toString())
+            buffer.deleteAt(0)
+        } else {
+            out.add(glyphFor(dict.getValue(m)))
+            buffer.delete(0, m.length)
+        }
+    }
+    return out
 }
 
 /**
@@ -28,25 +66,6 @@ internal fun appendLatinAndConsume(
     }
     buffer.append(c)
     return consumeIncremental(dict, buffer)
-}
-
-/**
- * スペース・句読点の直前などで、バッファを **貪欲に** 音節分割してから確定する。
- */
-internal fun flushGreedy(dict: Map<String, Int>, buffer: StringBuilder): List<String> {
-    val out = mutableListOf<String>()
-    while (buffer.isNotEmpty()) {
-        val b = buffer.toString()
-        val m = dict.keys.filter { b.startsWith(it) }.maxByOrNull { it.length }
-        if (m == null) {
-            out.add(buffer[0].toString())
-            buffer.deleteAt(0)
-        } else {
-            out.add(glyphFor(dict.getValue(m)))
-            buffer.delete(0, m.length)
-        }
-    }
-    return out
 }
 
 private fun consumeIncremental(
