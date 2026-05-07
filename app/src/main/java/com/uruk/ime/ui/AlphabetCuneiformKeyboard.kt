@@ -1,4 +1,4 @@
-package com.cuneiform.input.ui
+package com.uruk.ime.ui
 
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
@@ -36,10 +36,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cuneiform.input.sumerian.SumerianTransliteration
-import com.cuneiform.input.sumerian.appendLatinAndConsume
-import com.cuneiform.input.sumerian.digitBufferToCuneiformClusters
-import com.cuneiform.input.sumerian.flushGreedy
+import com.uruk.ime.sumerian.SumerianTransliteration
+import com.uruk.ime.sumerian.appendLatinAndConsume
+import com.uruk.ime.sumerian.digitBufferToCuneiformClusters
+import com.uruk.ime.sumerian.flushGreedy
 
 private data class LetterKey(val main: Char)
 

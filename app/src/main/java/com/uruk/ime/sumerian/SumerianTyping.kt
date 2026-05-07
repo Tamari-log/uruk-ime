@@ -1,4 +1,4 @@
-package com.cuneiform.input.sumerian
+package com.uruk.ime.sumerian
 
 private fun glyphFor(cp: Int): String = String(Character.toChars(cp))
 

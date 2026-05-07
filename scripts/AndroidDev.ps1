@@ -1,4 +1,4 @@
-# CuneiformInput / Android 実機開発まわり一式
+# uruk-ime (Uruk IME) / Android 実機開発まわり一式
 # - SDK 解決（ANDROID_HOME / local.properties、末尾空白の除去）
 # - platform-tools が無ければ sdkmanager で導入（要 cmdline-tools）
 # - 必要なら SDK ライセンス一括承認（y を複数行パイプ）
@@ -136,7 +136,7 @@ SDK root: $SdkRoot
     return $true
 }
 
-Write-Host "=== AndroidDev (CuneiformInput) ===" -ForegroundColor Magenta
+Write-Host "=== AndroidDev (uruk-ime) ===" -ForegroundColor Magenta
 
 $sdk = Resolve-SdkDir
 if (-not $sdk -or -not (Test-Path $sdk)) {

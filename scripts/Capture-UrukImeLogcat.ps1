@@ -1,11 +1,11 @@
-# CuneiformInput 用: logcat をファイルに保存し、関連行だけ別ファイルにも書く。
+# Uruk IME (uruk-ime) 用: logcat をファイルに保存し、関連行だけ別ファイルにも書く。
 # 前提: USB デバッグが許可され、`adb devices` が device であること。
 #
 #   . .\scripts\AndroidDev.ps1 -PathOnly -NoEnsurePlatformTools
-#   .\scripts\Capture-CuneiformLogcat.ps1
+#   .\scripts\Capture-UrukImeLogcat.ps1
 #
 # 再現直前にバッファを空にする:
-#   .\scripts\Capture-CuneiformLogcat.ps1 -ClearFirst
+#   .\scripts\Capture-UrukImeLogcat.ps1 -ClearFirst
 # その後フォームで IME を落とし、もう一度実行してダンプ。
 
 param(
@@ -26,8 +26,8 @@ if (-not $deviceOk) {
 }
 
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
-$fullLog = Join-Path $buildDir "cuneiform-logcat-full-$stamp.txt"
-$filtLog = Join-Path $buildDir "cuneiform-logcat-filtered-$stamp.txt"
+$fullLog = Join-Path $buildDir "uruk-ime-logcat-full-$stamp.txt"
+$filtLog = Join-Path $buildDir "uruk-ime-logcat-filtered-$stamp.txt"
 
 if ($ClearFirst) {
     Write-Host "Clearing logcat buffer..." -ForegroundColor Cyan
@@ -40,8 +40,8 @@ $raw = adb logcat -d -b main -b system -b crash -t $TailLines 2>&1
 $raw | Out-File -FilePath $fullLog -Encoding utf8
 
 $patterns = @(
-    "cuneiform", "Cuneiform", "CuneiformIME", "FATAL EXCEPTION", "AndroidRuntime",
-    "am_crash", "ActivityManager.*Process.*cuneiform", "InputMethod", "RemoteException",
+    "uruk\.ime", "UrukIme", "com\.uruk\.ime", "cuneiform", "Cuneiform", "FATAL EXCEPTION", "AndroidRuntime",
+    "am_crash", "ActivityManager.*Process.*uruk", "InputMethod", "RemoteException",
     "IllegalState", "IllegalArgument", "NullPointer", "Compose"
 )
 

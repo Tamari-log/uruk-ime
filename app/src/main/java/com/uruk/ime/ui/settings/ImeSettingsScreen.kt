@@ -1,4 +1,4 @@
-package com.cuneiform.input.ui.settings
+package com.uruk.ime.ui.settings
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -40,15 +40,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.cuneiform.input.R
-import com.cuneiform.input.prefs.ImeUserPrefs
-import com.cuneiform.input.prefs.KeySizeMode
-import com.cuneiform.input.prefs.ThemeMode
-import com.cuneiform.input.prefs.setImeDefaultTabIndex
-import com.cuneiform.input.prefs.setImeHapticOnKeypress
-import com.cuneiform.input.prefs.setImeKeySizeMode
-import com.cuneiform.input.prefs.setImeShowKeyBorders
-import com.cuneiform.input.prefs.setImeThemeMode
+import com.uruk.ime.R
+import com.uruk.ime.prefs.ImeUserPrefs
+import com.uruk.ime.prefs.KeySizeMode
+import com.uruk.ime.prefs.ThemeMode
+import com.uruk.ime.prefs.setImeDefaultTabIndex
+import com.uruk.ime.prefs.setImeHapticOnKeypress
+import com.uruk.ime.prefs.setImeKeySizeMode
+import com.uruk.ime.prefs.setImeShowKeyBorders
+import com.uruk.ime.prefs.setImeThemeMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

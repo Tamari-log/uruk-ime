@@ -1,4 +1,4 @@
-package com.cuneiform.input.sumerian
+package com.uruk.ime.sumerian
 
 /**
  * Unicode Cuneiform の **簡易符号名**（`CUNEIFORM SIGN XYZ` の XYZ を小文字化）に基づく転写辞書。

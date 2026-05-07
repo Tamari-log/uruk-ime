@@ -1,4 +1,4 @@
-package com.cuneiform.input.ui
+package com.uruk.ime.ui
 
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
@@ -32,9 +32,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cuneiform.input.R
-import com.cuneiform.input.cuneiformCodePoints
-import com.cuneiform.input.ui.theme.GridGlyphStyle
+import com.uruk.ime.R
+import com.uruk.ime.cuneiformCodePoints
+import com.uruk.ime.ui.theme.GridGlyphStyle
 
 private const val TAB_ALPHABET = 0
 private const val TAB_MAIN = 1
@@ -60,7 +60,7 @@ private fun ImeComposingStrip(text: String) {
 }
 
 @Composable
-fun CuneiformKeyboardContent(
+fun UrukImeKeyboardContent(
     tabIndex: Int,
     onTabChange: (Int) -> Unit,
     onGlyphSelected: (String) -> Unit,

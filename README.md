@@ -1,12 +1,12 @@
-# 楔形文字入力 · Cuneiform Input
+# Uruk IME (uruk-ime)
 
-**リポジトリ**: https://github.com/Tamari-log/CuneiformInput
-
-Android 用の **楔形文字（キッヌス・クネイフォーム）IME**。  
+Android 用の **楔形文字（キッヌス・クネイフォーム）入力 IME**。  
 Unicode の楔形文字ブロック（U+12000 台・U+12400 台など）を、グリッドとラテン転写入力から挿入できます。
 
-> **ベータ** — 仕様・見た目・挙動は変更されることがあります。  
-> リポジトリ名の候補は [docs/NAMING.md](docs/NAMING.md) を参照してください。
+> **ベータ** — 仕様・見た目・挙動は変更されることがあります。
+
+**リポジトリ（GitHub）**: https://github.com/Tamari-log/uruk-ime  
+（リネーム前は `CuneiformInput` でした。古い URL のリダイレクトは GitHub 設定に依存します。）
 
 ## 機能（概要）
 
@@ -37,11 +37,13 @@ Unicode の楔形文字ブロック（U+12000 台・U+12400 台など）を、�
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
+**applicationId / パッケージ**: `com.uruk.ime`
+
 ## インストール後（IME の有効化）
 
 1. **設定 → システム → 言語と入力**（機種により表記差あり）  
 2. **オンスクリーンキーボード → キーボードの管理** で本アプリをオン  
-3. 入力欄では **キーボード切替**から「楔形文字入力」等を選択
+3. 入力欄では **キーボード切替**から「Uruk IME」等を選択
 
 ## プライバシー
 
@@ -55,13 +57,13 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ## 開発メモ
 
-- `scripts/` にログ取得用 PowerShell があります（任意）。
-- IME 実装: `app/src/main/java/com/cuneiform/input/ime/`
+- `scripts/` にログ取得用 PowerShell があります（`Capture-UrukImeLogcat.ps1`）。
+- IME 実装: `app/src/main/java/com/uruk/ime/ime/`
 
 ---
 
 ### English (short)
 
-**Cuneiform Input** is an Android IME for entering cuneiform glyphs (Unicode blocks).  
+**Uruk IME** (`uruk-ime`) is an Android IME for entering cuneiform glyphs (Unicode blocks).  
 No ads, no analytics, no network calls in the app itself. See [Privacy Policy (JA)](docs/privacy-policy-ja.md).  
 Beta quality; APIs and UX may change.

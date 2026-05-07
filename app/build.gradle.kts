@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.cuneiform.input"
+    namespace = "com.uruk.ime"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.cuneiform.input"
+        applicationId = "com.uruk.ime"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
