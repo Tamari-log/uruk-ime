@@ -1,4 +1,4 @@
-package com.uruk.ime
+package com.belleval.enmerkar.type
 
 /** 末尾の1コードポイント（サロゲートペア含む）を除いた文字列 */
 internal fun String.withoutLastCodePoint(): String {

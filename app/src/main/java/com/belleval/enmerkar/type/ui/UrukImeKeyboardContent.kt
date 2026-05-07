@@ -1,4 +1,4 @@
-package com.uruk.ime.ui
+package com.belleval.enmerkar.type.ui
 
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
@@ -32,9 +32,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.uruk.ime.R
-import com.uruk.ime.cuneiformCodePoints
-import com.uruk.ime.ui.theme.GridGlyphStyle
+import com.belleval.enmerkar.type.R
+import com.belleval.enmerkar.type.cuneiformCodePoints
+import com.belleval.enmerkar.type.ui.theme.GridGlyphStyle
 
 private const val TAB_ALPHABET = 0
 private const val TAB_MAIN = 1

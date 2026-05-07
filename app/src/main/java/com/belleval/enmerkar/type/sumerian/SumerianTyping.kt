@@ -1,4 +1,4 @@
-package com.uruk.ime.sumerian
+package com.belleval.enmerkar.type.sumerian
 
 private fun glyphFor(cp: Int): String = String(Character.toChars(cp))
 

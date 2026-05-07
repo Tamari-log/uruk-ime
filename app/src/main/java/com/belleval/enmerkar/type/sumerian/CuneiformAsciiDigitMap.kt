@@ -1,4 +1,4 @@
-package com.uruk.ime.sumerian
+package com.belleval.enmerkar.type.sumerian
 
 /**
  * アラビア数字の入力バッファを **整数として解釈** し、楔形数字符号に変換する。
