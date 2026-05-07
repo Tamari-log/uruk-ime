@@ -14,11 +14,13 @@ local.properties
 
 # --- 秘密情報・署名（GitHub に上げたらアウト）---
 keystore.properties
+keystore.*.local.properties
 *.jks
 *.keystore
 *.pem
 .env
 .env.*
+google-services.json
 
 # release フォルダは手元専用（upload.jks 等）。説明テキストだけリポジトリに含める。
 release/*
