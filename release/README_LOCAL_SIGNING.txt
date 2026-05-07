@@ -7,8 +7,8 @@
 ■ パスワード等の設定
   プロジェクトの「一番上」のフォルダにある
     keystore.properties
-  に storePassword / keyPassword を書きます。
-  テンプレは keystore.properties.example を参照。
+  に storeFile / storePassword / keyAlias / keyPassword を書きます（Git に含めない）。
+  雛形はリポジトリ直下の keystore.properties.example をコピーして編集。
 
 ■ バックアップ
   upload.jks と keystore.properties は USB などに必ずコピーしてください。

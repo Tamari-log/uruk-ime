@@ -58,7 +58,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 ## 開発メモ
 
 - `scripts/` にログ取得用 PowerShell があります（`Capture-UrukImeLogcat.ps1`）。
-- IME 実装: `app/src/main/java/com/uruk/ime/ime/`
+- IME 実装: `app/src/main/java/com/belleval/enmerkar/type/`
 
 ---
 
