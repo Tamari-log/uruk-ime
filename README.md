@@ -27,6 +27,17 @@ Unicode の楔形文字ブロック（U+12000 台・U+12400 台など）を、�
 
 ## ビルド
 
+### Google Play 提出（Android App Bundle）
+
+```bash
+./gradlew bundleRelease
+```
+
+生成 AAB: `app/build/outputs/bundle/release/app-release.aab`  
+（`keystore.properties` とリリース用キーストアを用意したうえで署名されます。未設定の場合は debug キーで署名され、本番提出には不適切です。）
+
+### ローカル検証（デバッグ APK）
+
 ```bash
 ./gradlew assembleDebug
 ```
