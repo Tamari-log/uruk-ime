@@ -1,4 +1,4 @@
-package com.uruk.ime
+package com.belleval.enmerkar.type
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,11 +12,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import com.uruk.ime.prefs.ImeUserPrefs
-import com.uruk.ime.prefs.darkThemeFlag
-import com.uruk.ime.prefs.imeUserPrefsFlow
-import com.uruk.ime.ui.settings.ImeSettingsScreen
-import com.uruk.ime.ui.theme.UrukImeTheme
+import com.belleval.enmerkar.type.prefs.ImeUserPrefs
+import com.belleval.enmerkar.type.prefs.darkThemeFlag
+import com.belleval.enmerkar.type.prefs.imeUserPrefsFlow
+import com.belleval.enmerkar.type.ui.settings.DiagnosticLogScreen
+import com.belleval.enmerkar.type.ui.settings.ImeSettingsScreen
+import com.belleval.enmerkar.type.ui.theme.UrukImeTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,8 +31,17 @@ class MainActivity : ComponentActivity() {
             val systemDark = isSystemInDarkTheme()
             val darkTheme = prefs.darkThemeFlag(systemDark)
             val scope = rememberCoroutineScope()
+            var showDiagnosticLog by remember { mutableStateOf(false) }
             UrukImeTheme(darkTheme = darkTheme) {
-                ImeSettingsScreen(prefs = prefs, scope = scope)
+                if (showDiagnosticLog) {
+                    DiagnosticLogScreen(onBack = { showDiagnosticLog = false })
+                } else {
+                    ImeSettingsScreen(
+                        prefs = prefs,
+                        scope = scope,
+                        onOpenDiagnosticLog = { showDiagnosticLog = true },
+                    )
+                }
             }
         }
     }

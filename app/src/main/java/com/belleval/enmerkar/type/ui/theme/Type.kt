@@ -1,4 +1,4 @@
-package com.uruk.ime.ui.theme
+package com.belleval.enmerkar.type.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -7,7 +7,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.uruk.ime.R
+import com.belleval.enmerkar.type.R
 
 val CuneiformFontFamily = FontFamily(
     Font(R.font.noto_sans_cuneiform_regular, FontWeight.Normal, FontStyle.Normal),

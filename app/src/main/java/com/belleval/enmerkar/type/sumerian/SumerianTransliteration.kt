@@ -1,4 +1,4 @@
-package com.uruk.ime.sumerian
+package com.belleval.enmerkar.type.sumerian
 
 /**
  * Unicode Cuneiform の **簡易符号名**（`CUNEIFORM SIGN XYZ` の XYZ を小文字化）に基づく転写辞書。
