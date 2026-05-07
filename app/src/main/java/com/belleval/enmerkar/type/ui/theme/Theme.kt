@@ -1,4 +1,4 @@
-package com.uruk.ime.ui.theme
+package com.belleval.enmerkar.type.ui.theme
 
 import android.app.Activity
 import android.content.Context

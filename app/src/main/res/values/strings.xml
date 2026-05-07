@@ -27,6 +27,19 @@
     <string name="settings_theme_dark">ダーク</string>
 
     <string name="settings_section_about">このアプリについて</string>
+    <string name="settings_diagnostic_log_title">診断ログ</string>
+    <string name="settings_diagnostic_log_sub">エラーや不具合の履歴を確認・共有します（入力した文字は記録しません）</string>
+
+    <string name="diagnostic_log_title">診断ログ</string>
+    <string name="diagnostic_back">戻る</string>
+    <string name="diagnostic_log_description">未捕捉クラッシュ（クラッシュ直前）、IME のコミット失敗・ウインドウ設定失敗など、アプリ側で検知したイベントが時系列で記録されます。サポートに連絡するときは「コピー」または「共有」で全文を送ってください。</string>
+    <string name="diagnostic_copy">クリップボードにコピー</string>
+    <string name="diagnostic_share">共有</string>
+    <string name="diagnostic_share_subject">Uruk IME 診断ログ</string>
+    <string name="diagnostic_clear">ログを消去</string>
+    <string name="diagnostic_cleared">ログを消去しました</string>
+    <string name="diagnostic_copied">コピーしました</string>
+
     <string name="settings_version">バージョン</string>
 
     <string name="tab_alphabet">アルファベット</string>

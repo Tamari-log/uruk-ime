@@ -37,7 +37,7 @@ Unicode の楔形文字ブロック（U+12000 台・U+12400 台など）を、�
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-**applicationId / パッケージ**: `com.uruk.ime`
+**applicationId / パッケージ**: `com.belleval.enmerkar.type`
 
 ## インストール後（IME の有効化）
 

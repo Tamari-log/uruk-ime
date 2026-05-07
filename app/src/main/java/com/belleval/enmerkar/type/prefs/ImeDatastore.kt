@@ -1,8 +1,9 @@
-package com.uruk.ime.prefs
+package com.belleval.enmerkar.type.prefs
 
 import android.content.Context
 import android.util.Log
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import com.belleval.enmerkar.type.diagnostic.DiagnosticLog
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -36,6 +37,7 @@ fun Context.imeUserPrefsFlow(): Flow<ImeUserPrefs> =
     applicationContext.imeDataStore.data
         .catch { e ->
             Log.e(TAG_PREFS, "DataStore read failed; using defaults", e)
+            DiagnosticLog.e(TAG_PREFS, "DataStore read failed; using defaults", e)
             emit(emptyPreferences())
         }
         .map { it.toImeUserPrefs() }

@@ -1,4 +1,4 @@
-package com.uruk.ime.ui
+package com.belleval.enmerkar.type.ui
 
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
@@ -36,10 +36,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.uruk.ime.sumerian.SumerianTransliteration
-import com.uruk.ime.sumerian.appendLatinAndConsume
-import com.uruk.ime.sumerian.digitBufferToCuneiformClusters
-import com.uruk.ime.sumerian.flushGreedy
+import com.belleval.enmerkar.type.sumerian.SumerianTransliteration
+import com.belleval.enmerkar.type.sumerian.appendLatinAndConsume
+import com.belleval.enmerkar.type.sumerian.digitBufferToCuneiformClusters
+import com.belleval.enmerkar.type.sumerian.flushGreedy
 
 private data class LetterKey(val main: Char)
 
