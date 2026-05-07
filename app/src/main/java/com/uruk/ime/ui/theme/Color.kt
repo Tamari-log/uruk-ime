@@ -1,4 +1,4 @@
-package com.cuneiform.input.ui.theme
+package com.uruk.ime.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

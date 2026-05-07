@@ -1,7 +1,7 @@
 # プライバシーポリシー（ベータ版）
 
-**対象アプリ**: Cuneiform Input（楔形文字入力用 Android キーボード／IME）  
-**パッケージ名**: `com.cuneiform.input`  
+**対象アプリ**: Uruk IME（`uruk-ime`、楔形文字入力用 Android キーボード／IME）  
+**パッケージ名**: `com.uruk.ime`  
 **最終更新日**: 2026年5月7日
 
 > 本ポリシーはベータテスト時点の内容です。正式リリース前後に変更することがあります。変更後は、アプリ内または配布ページでお知らせします。
@@ -9,7 +9,7 @@
 ---
 
 本文書の最新版は、次の URL で公開しています。  
-https://github.com/Tamari-log/CuneiformInput/blob/main/docs/privacy-policy-ja.md
+https://github.com/Tamari-log/uruk-ime/blob/main/docs/privacy-policy-ja.md
 
 ---
 

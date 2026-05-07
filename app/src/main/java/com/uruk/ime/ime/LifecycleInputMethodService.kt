@@ -2,7 +2,7 @@
  * Derived from FlorisBoard's LifecycleInputMethodService (Apache-2.0).
  * https://github.com/florisboard/florisboard
  */
-package com.cuneiform.input.ime
+package com.uruk.ime.ime
 
 import android.inputmethodservice.InputMethodService
 import androidx.annotation.CallSuper

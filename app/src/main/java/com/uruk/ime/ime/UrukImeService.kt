@@ -1,4 +1,4 @@
-package com.cuneiform.input.ime
+package com.uruk.ime.ime
 
 import android.os.Build
 import android.util.Log
@@ -41,23 +41,23 @@ import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnLifecycleDe
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import com.cuneiform.input.R
-import com.cuneiform.input.prefs.ImeUserPrefs
-import com.cuneiform.input.prefs.darkThemeFlag
-import com.cuneiform.input.prefs.imeUserPrefsFlow
-import com.cuneiform.input.ui.CuneiformKeyboardContent
-import com.cuneiform.input.ui.theme.CuneiformInputTheme
-import com.cuneiform.input.utf16LengthOfLastCodePoint
+import com.uruk.ime.R
+import com.uruk.ime.prefs.ImeUserPrefs
+import com.uruk.ime.prefs.darkThemeFlag
+import com.uruk.ime.prefs.imeUserPrefsFlow
+import com.uruk.ime.ui.UrukImeKeyboardContent
+import com.uruk.ime.ui.theme.UrukImeTheme
+import com.uruk.ime.utf16LengthOfLastCodePoint
 
-private const val TAG_IME = "CuneiformIME"
+private const val TAG_IME = "UrukIme"
 
-private const val CONTENT_ROOT_TAG = "cuneiform_ime_compose_root"
+private const val CONTENT_ROOT_TAG = "uruk_ime_compose_root"
 
 /**
  * FlorisBoard 方式: [android.R.id.content] に Compose を載せ、[onCreateInputView] は null。
  * [LifecycleInputMethodService] で decor に ViewTree 所有者を載せる。
  */
-class CuneiformImeService : LifecycleInputMethodService() {
+class UrukImeService : LifecycleInputMethodService() {
 
     private var composeInputRoot: View? = null
 
@@ -138,7 +138,7 @@ class CuneiformImeService : LifecycleInputMethodService() {
                 }
                 val systemDark = isSystemInDarkTheme()
                 val darkTheme = prefs.darkThemeFlag(systemDark)
-                CuneiformInputTheme(darkTheme = darkTheme) {
+                UrukImeTheme(darkTheme = darkTheme) {
                     var tabIndex by remember { mutableIntStateOf(prefs.defaultTabIndex) }
                     LaunchedEffect(prefs.defaultTabIndex) {
                         tabIndex = prefs.defaultTabIndex
@@ -203,16 +203,16 @@ class CuneiformImeService : LifecycleInputMethodService() {
                                 }
                             }
                             HorizontalDivider()
-                            CuneiformKeyboardContent(
+                            UrukImeKeyboardContent(
                                 tabIndex = tabIndex,
                                 onTabChange = { tabIndex = it },
                                 onGlyphSelected = { ch ->
-                                    val ic = currentInputConnection ?: return@CuneiformKeyboardContent
+                                    val ic = currentInputConnection ?: return@UrukImeKeyboardContent
                                     ic.tryCommitGlyphText(ch)
                                 },
                                 onBackspace = {
-                                    val ic = currentInputConnection ?: return@CuneiformKeyboardContent
-                                    val before = ic.getTextBeforeCursor(8, 0) ?: return@CuneiformKeyboardContent
+                                    val ic = currentInputConnection ?: return@UrukImeKeyboardContent
+                                    val before = ic.getTextBeforeCursor(8, 0) ?: return@UrukImeKeyboardContent
                                     val n = before.utf16LengthOfLastCodePoint()
                                     if (n > 0) ic.deleteSurroundingText(n, 0)
                                 },

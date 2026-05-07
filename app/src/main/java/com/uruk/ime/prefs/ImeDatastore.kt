@@ -1,4 +1,4 @@
-package com.cuneiform.input.prefs
+package com.uruk.ime.prefs
 
 import android.content.Context
 import android.util.Log
@@ -23,14 +23,14 @@ private val KEY_SHOW_BORDERS = booleanPreferencesKey("show_key_borders")
 private val KEY_THEME = stringPreferencesKey("theme_mode")
 
 val Context.imeDataStore by preferencesDataStore(
-    name = "cuneiform_ime_settings",
+    name = "uruk_ime_settings",
     corruptionHandler =
         ReplaceFileCorruptionHandler(
             produceNewData = { emptyPreferences() },
         ),
 )
 
-private const val TAG_PREFS = "CuneiformPrefs"
+private const val TAG_PREFS = "UrukImePrefs"
 
 fun Context.imeUserPrefsFlow(): Flow<ImeUserPrefs> =
     applicationContext.imeDataStore.data

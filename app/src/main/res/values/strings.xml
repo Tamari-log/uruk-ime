@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">楔形文字入力</string>
-    <string name="settings_title">楔形文字キーボードの設定</string>
+    <string name="app_name">Uruk IME</string>
+    <string name="settings_title">Uruk IME の設定</string>
 
     <string name="settings_section_system">システム / 切り替え</string>
     <string name="settings_open_android_ime_settings">入力方法の設定を開く</string>
@@ -33,9 +33,9 @@
     <string name="tab_main">楔形文字</string>
     <string name="tab_numbers">数字・区切り</string>
 
-    <string name="ime_label">楔形文字 IME</string>
-    <string name="ime_subtype_label">楔形文字</string>
-    <string name="ime_keyboard_label">楔形文字キーボード</string>
+    <string name="ime_label">Uruk IME</string>
+    <string name="ime_subtype_label">Uruk IME</string>
+    <string name="ime_keyboard_label">Uruk IME キーボード</string>
     <string name="ime_hide_keyboard">キーボードを閉じる</string>
     <string name="action_delete">1 文字削除</string>
 </resources>

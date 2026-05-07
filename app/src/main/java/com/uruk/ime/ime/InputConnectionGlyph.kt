@@ -1,4 +1,4 @@
-package com.cuneiform.input.ime
+package com.uruk.ime.ime
 
 import android.util.Log
 import android.view.inputmethod.InputConnection
@@ -10,7 +10,7 @@ import android.view.inputmethod.InputConnection
  *
  * 変換中テキストを終了させてからコミットする（composing 状態のままコミットしない）。
  */
-private const val TAG_IME = "CuneiformIME"
+private const val TAG_IME = "UrukIme"
 
 internal fun InputConnection.commitGlyphText(glyph: String): Boolean {
     if (glyph.isEmpty()) return false

@@ -1,4 +1,4 @@
-package com.cuneiform.input.ui.theme
+package com.uruk.ime.ui.theme
 
 import android.app.Activity
 import android.content.Context
@@ -46,7 +46,7 @@ private tailrec fun Context.findActivity(): Activity? = when (this) {
 }
 
 @Composable
-fun CuneiformInputTheme(
+fun UrukImeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {

@@ -1,4 +1,4 @@
-package com.cuneiform.input
+package com.uruk.ime
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,11 +12,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import com.cuneiform.input.prefs.ImeUserPrefs
-import com.cuneiform.input.prefs.darkThemeFlag
-import com.cuneiform.input.prefs.imeUserPrefsFlow
-import com.cuneiform.input.ui.settings.ImeSettingsScreen
-import com.cuneiform.input.ui.theme.CuneiformInputTheme
+import com.uruk.ime.prefs.ImeUserPrefs
+import com.uruk.ime.prefs.darkThemeFlag
+import com.uruk.ime.prefs.imeUserPrefsFlow
+import com.uruk.ime.ui.settings.ImeSettingsScreen
+import com.uruk.ime.ui.theme.UrukImeTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
             val systemDark = isSystemInDarkTheme()
             val darkTheme = prefs.darkThemeFlag(systemDark)
             val scope = rememberCoroutineScope()
-            CuneiformInputTheme(darkTheme = darkTheme) {
+            UrukImeTheme(darkTheme = darkTheme) {
                 ImeSettingsScreen(prefs = prefs, scope = scope)
             }
         }

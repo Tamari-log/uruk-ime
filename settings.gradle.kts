@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CuneiformInput"
+rootProject.name = "uruk-ime"
 include(":app")
