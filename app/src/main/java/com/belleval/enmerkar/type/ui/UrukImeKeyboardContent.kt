@@ -1,6 +1,7 @@
 package com.belleval.enmerkar.type.ui
 
 import android.view.HapticFeedbackConstants
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.MaterialTheme
@@ -30,15 +32,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.belleval.enmerkar.type.R
 import com.belleval.enmerkar.type.cuneiformCodePoints
+import com.belleval.enmerkar.type.sumerian.MorphemeChip
+import com.belleval.enmerkar.type.sumerian.SumerianInflection
+import com.belleval.enmerkar.type.sumerian.SumerianTransliteration
+import com.belleval.enmerkar.type.sumerian.digitBufferToCuneiformClusters
+import com.belleval.enmerkar.type.sumerian.flushGreedy
 import com.belleval.enmerkar.type.ui.theme.GridGlyphStyle
 
 private const val TAB_ALPHABET = 0
 private const val TAB_MAIN = 1
 private const val TAB_NUMBERS = 2
+private const val TAB_INFLECT = 3
+private const val TAB_LAST = TAB_INFLECT
 
 @Composable
 private fun ImeComposingStrip(text: String) {
@@ -78,20 +90,58 @@ fun UrukImeKeyboardContent(
     var alphabetDigitBuffer by remember { mutableStateOf("") }
     var alphabetSymbolsPage by remember { mutableStateOf(false) }
 
-    LaunchedEffect(tabIndex) {
-        if (tabIndex != TAB_ALPHABET) {
-            alphabetRawBuffer = ""
+    val dict = remember { SumerianTransliteration.readingToCodepoint }
+
+    fun haptic() {
+        if (hapticOnKeypress) {
+            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+        }
+    }
+
+    /** ラテン／数字バッファを楔形にし、[onGlyphSelected] へ出す。 */
+    fun flushTransliterationBuffers() {
+        if (alphabetRawBuffer.isNotEmpty()) {
+            val sb = StringBuilder(alphabetRawBuffer)
+            for (g in flushGreedy(dict, sb)) {
+                onGlyphSelected(g)
+            }
+            alphabetRawBuffer = sb.toString()
+        }
+        if (alphabetDigitBuffer.isNotEmpty()) {
+            for (g in digitBufferToCuneiformClusters(alphabetDigitBuffer)) {
+                onGlyphSelected(g)
+            }
             alphabetDigitBuffer = ""
-            alphabetSymbolsPage = false
+        }
+    }
+
+    LaunchedEffect(tabIndex) {
+        when (tabIndex) {
+            TAB_ALPHABET -> Unit
+            TAB_INFLECT -> {
+                alphabetSymbolsPage = false
+                alphabetDigitBuffer = ""
+            }
+            TAB_MAIN,
+            TAB_NUMBERS -> {
+                alphabetSymbolsPage = false
+                alphabetDigitBuffer = ""
+            }
+            else -> Unit
         }
     }
 
     val composingDisplay =
         remember(tabIndex, alphabetRawBuffer, alphabetDigitBuffer, alphabetSymbolsPage) {
-            when {
-                tabIndex != TAB_ALPHABET -> ""
-                alphabetSymbolsPage -> alphabetDigitBuffer
-                else -> alphabetRawBuffer
+            when (tabIndex) {
+                TAB_ALPHABET ->
+                    if (alphabetSymbolsPage) {
+                        alphabetDigitBuffer
+                    } else {
+                        alphabetRawBuffer
+                    }
+                TAB_INFLECT -> alphabetRawBuffer
+                else -> ""
             }
         }
 
@@ -113,13 +163,11 @@ fun UrukImeKeyboardContent(
         if (composingDisplay.isNotEmpty()) {
             ImeComposingStrip(composingDisplay)
         }
-        TabRow(selectedTabIndex = tabIndex.coerceIn(TAB_ALPHABET, TAB_NUMBERS)) {
+        TabRow(selectedTabIndex = tabIndex.coerceIn(TAB_ALPHABET, TAB_LAST)) {
             Tab(
                 selected = tabIndex == TAB_ALPHABET,
                 onClick = {
-                    if (hapticOnKeypress) {
-                        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                    }
+                    haptic()
                     onTabChange(TAB_ALPHABET)
                 },
                 text = { Text(stringResource(R.string.tab_alphabet)) },
@@ -127,9 +175,7 @@ fun UrukImeKeyboardContent(
             Tab(
                 selected = tabIndex == TAB_MAIN,
                 onClick = {
-                    if (hapticOnKeypress) {
-                        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                    }
+                    haptic()
                     onTabChange(TAB_MAIN)
                 },
                 text = { Text(stringResource(R.string.tab_main)) },
@@ -137,12 +183,18 @@ fun UrukImeKeyboardContent(
             Tab(
                 selected = tabIndex == TAB_NUMBERS,
                 onClick = {
-                    if (hapticOnKeypress) {
-                        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                    }
+                    haptic()
                     onTabChange(TAB_NUMBERS)
                 },
                 text = { Text(stringResource(R.string.tab_numbers)) },
+            )
+            Tab(
+                selected = tabIndex == TAB_INFLECT,
+                onClick = {
+                    haptic()
+                    onTabChange(TAB_INFLECT)
+                },
+                text = { Text(stringResource(R.string.tab_inflect)) },
             )
         }
 
@@ -172,6 +224,25 @@ fun UrukImeKeyboardContent(
                     )
                 }
             }
+            TAB_INFLECT -> {
+                InflectionKeyboardPanel(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(keyboardAreaHeightDp.dp),
+                    gridMinCellDp = gridMinCellDp,
+                    gridCellHeightDp = gridCellHeightDp,
+                    showKeyBorders = showKeyBorders,
+                    onAppendLatin = { piece ->
+                        haptic()
+                        alphabetRawBuffer += piece
+                    },
+                    onConfirmFlush = {
+                        haptic()
+                        flushTransliterationBuffers()
+                    },
+                )
+            }
             else -> {
                 val gridPoints = activePoints ?: mainBlock
                 LazyVerticalGrid(
@@ -195,9 +266,8 @@ fun UrukImeKeyboardContent(
                         Box(
                             modifier = borderMod
                                 .clickable {
-                                    if (hapticOnKeypress) {
-                                        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                                    }
+                                    haptic()
+                                    flushTransliterationBuffers()
                                     onGlyphSelected(ch)
                                 }
                                 .height(gridCellHeightDp.dp)
@@ -213,5 +283,113 @@ fun UrukImeKeyboardContent(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun InflectionKeyboardPanel(
+    modifier: Modifier = Modifier,
+    gridMinCellDp: Float,
+    gridCellHeightDp: Float,
+    showKeyBorders: Boolean,
+    onAppendLatin: (String) -> Unit,
+    onConfirmFlush: () -> Unit,
+) {
+    val morphemeLists =
+        listOf(
+            stringResource(R.string.inflect_section_verbal) to SumerianInflection.verbalPrefixes,
+            stringResource(R.string.inflect_section_nominal) to SumerianInflection.nominalCaseSuffixes,
+            stringResource(R.string.inflect_section_pronoun) to SumerianInflection.pronominalSuffixes,
+        )
+
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = gridMinCellDp.dp),
+        modifier = modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+        contentPadding = PaddingValues(bottom = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        for ((title, chips) in morphemeLists) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Text(
+                    text = title,
+                    modifier = Modifier.padding(top = 6.dp, bottom = 2.dp),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            items(items = chips, key = { it.shortLabel + it.insertsLatin }) { chip ->
+                MorphemeChipKey(
+                    chip = chip,
+                    height = gridCellHeightDp.dp,
+                    showKeyBorders = showKeyBorders,
+                    onClick = { onAppendLatin(chip.insertsLatin) },
+                )
+            }
+        }
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            val borderMod =
+                if (showKeyBorders) {
+                    Modifier.border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+                } else {
+                    Modifier
+                }
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height((gridCellHeightDp * 0.95f).dp)
+                        .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.65f))
+                        .then(borderMod)
+                        .clickable { onConfirmFlush() }
+                        .padding(8.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = stringResource(R.string.inflect_confirm_flush),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MorphemeChipKey(
+    chip: MorphemeChip,
+    height: Dp,
+    showKeyBorders: Boolean,
+    onClick: () -> Unit,
+) {
+    val shape = RoundedCornerShape(6.dp)
+    val borderMod =
+        if (showKeyBorders) {
+            Modifier.border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f), shape)
+        } else {
+            Modifier
+        }
+    Box(
+        modifier =
+            Modifier
+                .height(height)
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh, shape)
+                .then(borderMod)
+                .clickable(onClick = onClick)
+                .padding(horizontal = 4.dp, vertical = 6.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = chip.shortLabel,
+            style = MaterialTheme.typography.labelMedium,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 2,
+        )
     }
 }

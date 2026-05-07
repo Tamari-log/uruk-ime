@@ -3,6 +3,17 @@ package com.belleval.enmerkar.type.sumerian
 private fun glyphFor(cp: Int): String = String(Character.toChars(cp))
 
 /**
+ * ラテン転写だけ [buffer] に足す。楔形への変換は [flushGreedy] 等の確定処理でのみ行う。
+ */
+internal fun appendLatinRaw(buffer: StringBuilder, ch: Char) {
+    when {
+        ch.lowercaseChar() in 'a'..'z' -> buffer.append(ch.lowercaseChar())
+        ch == '\'' -> buffer.append('\'')
+        else -> Unit
+    }
+}
+
+/**
  * 1 文字追加ごとの増分変換: バッファ先頭から確定できる分だけ楔形を列挙する。
  * まだ読みが延びうるときは空リストを返してバッファを保持する。
  */
