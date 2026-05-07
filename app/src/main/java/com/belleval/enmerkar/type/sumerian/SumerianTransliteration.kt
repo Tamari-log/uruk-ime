@@ -8,7 +8,8 @@ package com.belleval.enmerkar.type.sumerian
  * **曖昧さ**: `lu` は `lugal` 等の接頭辞でもあるため、貪欲確定は文字を区切ってから行う。
  * **ラテン文字の入力中は楔形に変換しない**。スペース・句読点・改行・（記号ページの）記号キーや、
  * 楔形グリッドで符号を選ぶ直前に、未変換バッファを貪欲分割して確定する。
- * **ハイフン `-`**: バッファにそのまま挿入。確定時に **音節境界** としてセグメント分割する（例: `ma-e`）。
+ * **同一符号の別音価マップ**（`syllableReadingAliases`）、**単独子音**および **sh** などの複合子音の暫定音節化（e→a→i→u）で、
+ * ラテンが楔形の前に挟まらないようにする。
  */
 object SumerianTransliteration {
     val readingToCodepoint: Map<String, Int> by lazy {
@@ -310,6 +311,25 @@ object SumerianTransliteration {
             "zu5" to 0x1236B,
             "zubur" to 0x1236D,
             "zum" to 0x1236E,
-        )
+        ) + syllableReadingAliases
     }
 }
+
+/**
+ * 同一楔形符号への別音価・慣用音節転写（Sumero-Akkadian の音節文字で一般的な対応）。
+ * 多言語・方言で音価が分岐するため、汎用 IME としてよく入力される転写を補う（厳密な音韻記号ではない）。
+ */
+private val syllableReadingAliases: Map<String, Int> =
+    mapOf(
+        "he" to 0x1212D,
+        "be" to 0x12049,
+        "de" to 0x122FC,
+        "ge" to 0x12100,
+        "ke" to 0x12157,
+        "le" to 0x121B7,
+        "pe" to 0x1227F,
+        "re" to 0x12291,
+        "se" to 0x122DB,
+        "shi" to 0x122DB,
+        "ho" to 0x12137,
+    )
