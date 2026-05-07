@@ -5,8 +5,9 @@ package com.belleval.enmerkar.type.sumerian
  * [UnicodeData 15.1](https://unicode.org/Public/15.1.0/ucd/UnicodeData.txt) の U+12000–123FF（＋一部）を対象に自動生成し、
  * `lu` → U+121FD（𒇽、LU2）、`lu1` → U+121FB（LU1）を手動で上書きした。
  *
- * **曖昧さ**: `lu` は `lugal` 等の接頭辞でもあるため、**単独の lu を入力中は次の文字を待つ**。
- * **スペース・句読点・改行・記号キー**を押すと未変換バッファを貪欲に分割して確定する。
+ * **曖昧さ**: `lu` は `lugal` 等の接頭辞でもあるため、貪欲確定は文字を区切ってから行う。
+ * **ラテン文字の入力中は楔形に変換しない**。スペース・句読点・改行・（記号ページの）記号キーや、
+ * 楔形グリッドで符号を選ぶ直前に、未変換バッファを貪欲分割して確定する。
  */
 object SumerianTransliteration {
     val readingToCodepoint: Map<String, Int> by lazy {

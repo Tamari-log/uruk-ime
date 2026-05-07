@@ -140,6 +140,7 @@ fun ImeSettingsScreen(
                             stringResource(R.string.tab_alphabet) to 0,
                             stringResource(R.string.tab_main) to 1,
                             stringResource(R.string.tab_numbers) to 2,
+                            stringResource(R.string.tab_inflect) to 3,
                         ),
                     selectedIndex = prefs.defaultTabIndex,
                     onSelect = { idx ->

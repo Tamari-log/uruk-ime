@@ -127,7 +127,7 @@ fun Preferences.toImeUserPrefs(): ImeUserPrefs {
                 else -> 0
             }
         } else {
-            (rawDefaultTab ?: 0).coerceIn(0, 2)
+            (rawDefaultTab ?: 0).coerceIn(0, 3)
         }
     return ImeUserPrefs(
         hapticOnKeypress = this[KEY_HAPTIC] ?: true,
@@ -147,35 +147,35 @@ fun ImeUserPrefs.darkThemeFlag(systemIsDark: Boolean): Boolean =
 
 suspend fun Context.setImeHapticOnKeypress(enabled: Boolean) {
     applicationContext.imeDataStore.edit {
-        it[KEY_SETTINGS_VERSION] = 2
+        it[KEY_SETTINGS_VERSION] = 3
         it[KEY_HAPTIC] = enabled
     }
 }
 
 suspend fun Context.setImeDefaultTabIndex(index: Int) {
     applicationContext.imeDataStore.edit {
-        it[KEY_SETTINGS_VERSION] = 2
-        it[KEY_DEFAULT_TAB] = index.coerceIn(0, 2)
+        it[KEY_SETTINGS_VERSION] = 3
+        it[KEY_DEFAULT_TAB] = index.coerceIn(0, 3)
     }
 }
 
 suspend fun Context.setImeKeySizeMode(mode: KeySizeMode) {
     applicationContext.imeDataStore.edit {
-        it[KEY_SETTINGS_VERSION] = 2
+        it[KEY_SETTINGS_VERSION] = 3
         it[KEY_KEY_SIZE] = mode.toStorageString()
     }
 }
 
 suspend fun Context.setImeShowKeyBorders(show: Boolean) {
     applicationContext.imeDataStore.edit {
-        it[KEY_SETTINGS_VERSION] = 2
+        it[KEY_SETTINGS_VERSION] = 3
         it[KEY_SHOW_BORDERS] = show
     }
 }
 
 suspend fun Context.setImeThemeMode(mode: ThemeMode) {
     applicationContext.imeDataStore.edit {
-        it[KEY_SETTINGS_VERSION] = 2
+        it[KEY_SETTINGS_VERSION] = 3
         it[KEY_THEME] = mode.name.lowercase()
     }
 }

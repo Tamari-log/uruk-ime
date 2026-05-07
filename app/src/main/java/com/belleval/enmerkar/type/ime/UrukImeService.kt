@@ -5,10 +5,8 @@ import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
-import android.widget.FrameLayout
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -51,10 +49,9 @@ import com.belleval.enmerkar.type.utf16LengthOfLastCodePoint
 
 private const val TAG_IME = "UrukIme"
 
-private const val CONTENT_ROOT_TAG = "uruk_ime_compose_root"
-
 /**
- * FlorisBoard 方式: [android.R.id.content] に Compose を載せ、[onCreateInputView] は null。
+ * [onCreateInputView] でキーボード [View] を返し、[InputMethodService] の inputArea（[android.R.id.inputArea]）に載せる。
+ * inputArea が空のままだと [onComputeInsets] が誤った領域となり、アプリ側の IME インセット／スクロールがずれる。
  * [LifecycleInputMethodService] で decor に ViewTree 所有者を載せる。
  */
 class UrukImeService : LifecycleInputMethodService() {
@@ -106,28 +103,9 @@ class UrukImeService : LifecycleInputMethodService() {
         return try {
             installViewTreeOwners()
             applyImeWindowLayout()
-            val decorContent =
-                window?.window?.findViewById<ViewGroup>(android.R.id.content)
-                    ?: run {
-                        DiagnosticLog.e(TAG_IME, "onCreateInputView: content is null", null)
-                        return null
-                    }
-            decorContent.findViewWithTag<View>(CONTENT_ROOT_TAG)?.let {
-                decorContent.removeView(it)
-            }
             val compose = buildKeyboardComposeView()
-            compose.tag = CONTENT_ROOT_TAG
-            decorContent.addView(
-                compose,
-                FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                ).apply {
-                    gravity = Gravity.BOTTOM
-                },
-            )
             composeInputRoot = compose
-            null
+            compose
         } catch (t: Throwable) {
             DiagnosticLog.e(TAG_IME, "onCreateInputView failed", t)
             null
@@ -234,28 +212,6 @@ class UrukImeService : LifecycleInputMethodService() {
                 }
             }
         }
-
-    @Suppress("DEPRECATION")
-    override fun onComputeInsets(outInsets: android.inputmethodservice.InputMethodService.Insets) {
-        super.onComputeInsets(outInsets)
-        val v = composeInputRoot
-        if (v != null && v.isShown && v.width > 0 && v.height > 0) {
-            val screenLoc = IntArray(2)
-            v.getLocationOnScreen(screenLoc)
-            outInsets.contentTopInsets = screenLoc[1]
-            outInsets.visibleTopInsets = screenLoc[1]
-            outInsets.touchableInsets =
-                android.inputmethodservice.InputMethodService.Insets.TOUCHABLE_INSETS_REGION
-            val winLoc = IntArray(2)
-            v.getLocationInWindow(winLoc)
-            outInsets.touchableRegion.set(
-                winLoc[0],
-                winLoc[1],
-                winLoc[0] + v.width,
-                winLoc[1] + v.height,
-            )
-        }
-    }
 
     override fun onEvaluateFullscreenMode(): Boolean = false
 

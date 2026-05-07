@@ -6,9 +6,9 @@
     <application
         android:name=".UrukImeApplication"
         android:allowBackup="true"
-        android:icon="@drawable/ic_cuneiform_launcher"
+        android:icon="@drawable/ic_launcher_enmerkar"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/ic_cuneiform_launcher"
+        android:roundIcon="@drawable/ic_launcher_enmerkar"
         android:supportsRtl="true"
         android:theme="@style/Theme.UrukIme">
         <activity

@@ -45,6 +45,12 @@
     <string name="tab_alphabet">アルファベット</string>
     <string name="tab_main">楔形文字</string>
     <string name="tab_numbers">数字・区切り</string>
+    <string name="tab_inflect">活用</string>
+
+    <string name="inflect_section_verbal">動詞接頭辞（転写を連結）</string>
+    <string name="inflect_section_nominal">格・名詞接尾（転写）</string>
+    <string name="inflect_section_pronoun">人称接尾（例）</string>
+    <string name="inflect_confirm_flush">確定（バッファを楔形に変換）</string>
 
     <string name="ime_label">Uruk IME</string>
     <string name="ime_subtype_label">Uruk IME</string>
