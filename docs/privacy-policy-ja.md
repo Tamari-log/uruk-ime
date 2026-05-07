@@ -8,6 +8,11 @@
 
 ---
 
+本文書の最新版は、次の URL で公開しています。  
+https://github.com/Tamari-log/CuneiformInput/blob/main/docs/privacy-policy-ja.md
+
+---
+
 ## 1. 運営者
 
 本アプリの運営者（以下「当運営」）は次のとおりです。  
