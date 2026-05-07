@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 粘土板と楔の形を簡略化したランチャーアイコン -->
+    <path
+        android:fillColor="#6D4C41"
+        android:pathData="M16,20h76v68h-76z" />
+    <path
+        android:fillColor="#BCAAA4"
+        android:pathData="M28,36 L54,24 L80,36 L80,76 L28,76z" />
+    <path
+        android:fillColor="#3E2723"
+        android:pathData="M42,44 L54,38 L66,44 L60,70 L48,70z" />
+</vector>
