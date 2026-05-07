@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">楔形文字入力</string>
+    <string name="settings_title">楔形文字キーボードの設定</string>
+
+    <string name="settings_section_system">システム / 切り替え</string>
+    <string name="settings_open_android_ime_settings">入力方法の設定を開く</string>
+    <string name="settings_open_android_ime_settings_sub">OS のキーボード一覧や既定の入力方法を変更します</string>
+    <string name="settings_open_ime_picker">キーボードを選択</string>
+    <string name="settings_open_ime_picker_sub">利用する IME を切り替えます</string>
+
+    <string name="settings_section_keyboard">キーボード</string>
+    <string name="settings_haptic_keys">キーを押したときのバイブレーション</string>
+    <string name="settings_haptic_keys_sub">キー操作時に短い触覚フィードバックを出します</string>
+    <string name="settings_default_tab">キーボードを開いたときのタブ</string>
+    <string name="settings_key_size">キーのサイズ</string>
+    <string name="settings_key_size_compact">小</string>
+    <string name="settings_key_size_standard">標準</string>
+    <string name="settings_key_size_comfortable">大</string>
+    <string name="settings_key_borders">キーの枠線</string>
+    <string name="settings_key_borders_sub">各キーまわりの境界線を表示します</string>
+
+    <string name="settings_section_appearance">外観</string>
+    <string name="settings_theme_keyboard_and_app">テーマ（アプリとキーボード）</string>
+    <string name="settings_theme_system">システム</string>
+    <string name="settings_theme_light">ライト</string>
+    <string name="settings_theme_dark">ダーク</string>
+
+    <string name="settings_section_about">このアプリについて</string>
+    <string name="settings_version">バージョン</string>
+
+    <string name="tab_alphabet">アルファベット</string>
+    <string name="tab_main">楔形文字</string>
+    <string name="tab_numbers">数字・区切り</string>
+
+    <string name="ime_label">楔形文字 IME</string>
+    <string name="ime_subtype_label">楔形文字</string>
+    <string name="ime_keyboard_label">楔形文字キーボード</string>
+    <string name="ime_hide_keyboard">キーボードを閉じる</string>
+    <string name="action_delete">1 文字削除</string>
+</resources>
