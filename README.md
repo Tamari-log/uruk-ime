@@ -1,5 +1,7 @@
 # 楔形文字入力 · Cuneiform Input
 
+**リポジトリ**: https://github.com/Tamari-log/CuneiformInput
+
 Android 用の **楔形文字（キッヌス・クネイフォーム）IME**。  
 Unicode の楔形文字ブロック（U+12000 台・U+12400 台など）を、グリッドとラテン転写入力から挿入できます。
 
