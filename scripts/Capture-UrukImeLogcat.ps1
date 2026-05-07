@@ -26,8 +26,8 @@ if (-not $deviceOk) {
 }
 
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
-$fullLog = Join-Path $buildDir "uruk-ime-logcat-full-$stamp.txt"
-$filtLog = Join-Path $buildDir "uruk-ime-logcat-filtered-$stamp.txt"
+$fullLog = Join-Path $buildDir "enmerkar-ime-logcat-full-$stamp.txt"
+$filtLog = Join-Path $buildDir "enmerkar-ime-logcat-filtered-$stamp.txt"
 
 if ($ClearFirst) {
     Write-Host "Clearing logcat buffer..." -ForegroundColor Cyan
@@ -40,8 +40,8 @@ $raw = adb logcat -d -b main -b system -b crash -t $TailLines 2>&1
 $raw | Out-File -FilePath $fullLog -Encoding utf8
 
 $patterns = @(
-    "uruk\.ime", "UrukIme", "com\.uruk\.ime", "cuneiform", "Cuneiform", "FATAL EXCEPTION", "AndroidRuntime",
-    "am_crash", "ActivityManager.*Process.*uruk", "InputMethod", "RemoteException",
+    "belleval\.enmerkar", "com\.belleval\.enmerkar\.type", "UrukIme", "cuneiform", "Cuneiform", "FATAL EXCEPTION", "AndroidRuntime",
+    "am_crash", "ActivityManager.*Process.*enmerkar", "InputMethod", "RemoteException",
     "IllegalState", "IllegalArgument", "NullPointer", "Compose"
 )
 

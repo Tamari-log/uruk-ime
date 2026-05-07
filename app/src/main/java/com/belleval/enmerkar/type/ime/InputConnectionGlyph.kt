@@ -1,7 +1,7 @@
-package com.uruk.ime.ime
+package com.belleval.enmerkar.type.ime
 
-import android.util.Log
 import android.view.inputmethod.InputConnection
+import com.belleval.enmerkar.type.diagnostic.DiagnosticLog
 
 /**
  * 公式ドキュメントどおり、[InputConnection.commitText] の newCursorPosition に **1** を渡すと
@@ -26,9 +26,9 @@ internal fun InputConnection.commitGlyphText(glyph: String): Boolean {
 internal fun InputConnection.tryCommitGlyphText(glyph: String) {
     try {
         if (!commitGlyphText(glyph)) {
-            Log.w(TAG_IME, "commitText returned false")
+            DiagnosticLog.w(TAG_IME, "commitText returned false (glyph UTF-16 len=${glyph.length})")
         }
     } catch (e: Throwable) {
-        Log.e(TAG_IME, "commit failed; glyph len UTF-16=${glyph.length}", e)
+        DiagnosticLog.e(TAG_IME, "commit failed; glyph UTF-16 len=${glyph.length}", e)
     }
 }

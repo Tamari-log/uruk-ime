@@ -1,4 +1,4 @@
-package com.uruk.ime.ui.settings
+package com.belleval.enmerkar.type.ui.settings
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Settings
@@ -39,16 +40,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.uruk.ime.R
-import com.uruk.ime.prefs.ImeUserPrefs
-import com.uruk.ime.prefs.KeySizeMode
-import com.uruk.ime.prefs.ThemeMode
-import com.uruk.ime.prefs.setImeDefaultTabIndex
-import com.uruk.ime.prefs.setImeHapticOnKeypress
-import com.uruk.ime.prefs.setImeKeySizeMode
-import com.uruk.ime.prefs.setImeShowKeyBorders
-import com.uruk.ime.prefs.setImeThemeMode
+import com.belleval.enmerkar.type.R
+import com.belleval.enmerkar.type.prefs.ImeUserPrefs
+import com.belleval.enmerkar.type.prefs.KeySizeMode
+import com.belleval.enmerkar.type.prefs.ThemeMode
+import com.belleval.enmerkar.type.prefs.setImeDefaultTabIndex
+import com.belleval.enmerkar.type.prefs.setImeHapticOnKeypress
+import com.belleval.enmerkar.type.prefs.setImeKeySizeMode
+import com.belleval.enmerkar.type.prefs.setImeShowKeyBorders
+import com.belleval.enmerkar.type.prefs.setImeThemeMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -57,6 +60,7 @@ import kotlinx.coroutines.launch
 fun ImeSettingsScreen(
     prefs: ImeUserPrefs,
     scope: CoroutineScope,
+    onOpenDiagnosticLog: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -187,6 +191,14 @@ fun ImeSettingsScreen(
             item {
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                 SettingsSectionLabel(stringResource(R.string.settings_section_about))
+            }
+            item {
+                SettingsNavCard(
+                    title = stringResource(R.string.settings_diagnostic_log_title),
+                    subtitle = stringResource(R.string.settings_diagnostic_log_sub),
+                    icon = Icons.Default.BugReport,
+                    onClick = onOpenDiagnosticLog,
+                )
             }
             item {
                 Card(
@@ -327,16 +339,29 @@ private fun SegmentedChoiceCard(
         Column(Modifier.padding(16.dp)) {
             Text(title, style = MaterialTheme.typography.titleSmall)
             SingleChoiceSegmentedButtonRow(
-                modifier = Modifier.padding(top = 12.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
             ) {
                 options.forEachIndexed { index, pair ->
                     val (label, value) = pair
                     SegmentedButton(
-                        shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                        onClick = { onSelect(value) },
                         selected = selectedIndex == value,
+                        onClick = { onSelect(value) },
+                        modifier = Modifier.weight(1f),
+                        shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                        icon = { SegmentedButtonDefaults.Icon(active = false) },
                     ) {
-                        Text(label)
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.labelMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            softWrap = false,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
                     }
                 }
             }
@@ -362,17 +387,28 @@ private fun SegmentedTriCard(
     ) {
         Column(Modifier.padding(16.dp)) {
             Text(title, style = MaterialTheme.typography.titleSmall)
-            SingleChoiceSegmentedButtonRow(modifier = Modifier.padding(top = 12.dp)) {
+            SingleChoiceSegmentedButtonRow(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+            ) {
                 modes.forEachIndexed { index, mode ->
                     SegmentedButton(
-                        shape = SegmentedButtonDefaults.itemShape(index = index, count = modes.size),
-                        onClick = { onSelect(mode) },
                         selected = mode == selected,
+                        onClick = { onSelect(mode) },
+                        modifier = Modifier.weight(1f),
+                        shape = SegmentedButtonDefaults.itemShape(index = index, count = modes.size),
+                        icon = { SegmentedButtonDefaults.Icon(active = false) },
                     ) {
                         Text(
-                            labels[index],
+                            text = labels[index],
                             style = MaterialTheme.typography.labelMedium,
                             maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            softWrap = false,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }
@@ -404,14 +440,29 @@ private fun SegmentedTriThemeCard(
     ) {
         Column(Modifier.padding(16.dp)) {
             Text(title, style = MaterialTheme.typography.titleSmall)
-            SingleChoiceSegmentedButtonRow(modifier = Modifier.padding(top = 12.dp)) {
+            SingleChoiceSegmentedButtonRow(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+            ) {
                 modes.forEachIndexed { index, mode ->
                     SegmentedButton(
-                        shape = SegmentedButtonDefaults.itemShape(index = index, count = modes.size),
-                        onClick = { onSelect(mode) },
                         selected = mode == selected,
+                        onClick = { onSelect(mode) },
+                        modifier = Modifier.weight(1f),
+                        shape = SegmentedButtonDefaults.itemShape(index = index, count = modes.size),
+                        icon = { SegmentedButtonDefaults.Icon(active = false) },
                     ) {
-                        Text(labels[index])
+                        Text(
+                            text = labels[index],
+                            style = MaterialTheme.typography.labelMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            softWrap = false,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
                     }
                 }
             }

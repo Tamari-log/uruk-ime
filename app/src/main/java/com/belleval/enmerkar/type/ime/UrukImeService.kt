@@ -1,7 +1,6 @@
-package com.uruk.ime.ime
+package com.belleval.enmerkar.type.ime
 
 import android.os.Build
-import android.util.Log
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
@@ -41,13 +40,14 @@ import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnLifecycleDe
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import com.uruk.ime.R
-import com.uruk.ime.prefs.ImeUserPrefs
-import com.uruk.ime.prefs.darkThemeFlag
-import com.uruk.ime.prefs.imeUserPrefsFlow
-import com.uruk.ime.ui.UrukImeKeyboardContent
-import com.uruk.ime.ui.theme.UrukImeTheme
-import com.uruk.ime.utf16LengthOfLastCodePoint
+import com.belleval.enmerkar.type.R
+import com.belleval.enmerkar.type.diagnostic.DiagnosticLog
+import com.belleval.enmerkar.type.prefs.ImeUserPrefs
+import com.belleval.enmerkar.type.prefs.darkThemeFlag
+import com.belleval.enmerkar.type.prefs.imeUserPrefsFlow
+import com.belleval.enmerkar.type.ui.UrukImeKeyboardContent
+import com.belleval.enmerkar.type.ui.theme.UrukImeTheme
+import com.belleval.enmerkar.type.utf16LengthOfLastCodePoint
 
 private const val TAG_IME = "UrukIme"
 
@@ -63,6 +63,7 @@ class UrukImeService : LifecycleInputMethodService() {
 
     override fun onCreate() {
         super.onCreate()
+        DiagnosticLog.i(TAG_IME, "UrukImeService onCreate")
         setExtractViewShown(false)
         window?.window?.let { w ->
             WindowCompat.setDecorFitsSystemWindows(w, false)
@@ -80,7 +81,7 @@ class UrukImeService : LifecycleInputMethodService() {
     private fun applyImeWindowLayout() {
         try {
             val w = window?.window ?: run {
-                Log.w(TAG_IME, "applyImeWindowLayout: inner window is null")
+                DiagnosticLog.w(TAG_IME, "applyImeWindowLayout: inner window is null")
                 return
             }
             val lp = w.attributes
@@ -95,37 +96,42 @@ class UrukImeService : LifecycleInputMethodService() {
                 WindowManager.LayoutParams.WRAP_CONTENT,
             )
         } catch (e: Throwable) {
-            Log.e(TAG_IME, "applyImeWindowLayout failed", e)
+            DiagnosticLog.e(TAG_IME, "applyImeWindowLayout failed", e)
         }
     }
 
     override fun onCreateCandidatesView(): View? = null
 
     override fun onCreateInputView(): View? {
-        installViewTreeOwners()
-        applyImeWindowLayout()
-        val decorContent =
-            window?.window?.findViewById<ViewGroup>(android.R.id.content)
-                ?: run {
-                    Log.e(TAG_IME, "onCreateInputView: content is null")
-                    return null
-                }
-        decorContent.findViewWithTag<View>(CONTENT_ROOT_TAG)?.let {
-            decorContent.removeView(it)
+        return try {
+            installViewTreeOwners()
+            applyImeWindowLayout()
+            val decorContent =
+                window?.window?.findViewById<ViewGroup>(android.R.id.content)
+                    ?: run {
+                        DiagnosticLog.e(TAG_IME, "onCreateInputView: content is null", null)
+                        return null
+                    }
+            decorContent.findViewWithTag<View>(CONTENT_ROOT_TAG)?.let {
+                decorContent.removeView(it)
+            }
+            val compose = buildKeyboardComposeView()
+            compose.tag = CONTENT_ROOT_TAG
+            decorContent.addView(
+                compose,
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                ).apply {
+                    gravity = Gravity.BOTTOM
+                },
+            )
+            composeInputRoot = compose
+            null
+        } catch (t: Throwable) {
+            DiagnosticLog.e(TAG_IME, "onCreateInputView failed", t)
+            null
         }
-        val compose = buildKeyboardComposeView()
-        compose.tag = CONTENT_ROOT_TAG
-        decorContent.addView(
-            compose,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-            ).apply {
-                gravity = Gravity.BOTTOM
-            },
-        )
-        composeInputRoot = compose
-        return null
     }
 
     private fun buildKeyboardComposeView(): ComposeView =
