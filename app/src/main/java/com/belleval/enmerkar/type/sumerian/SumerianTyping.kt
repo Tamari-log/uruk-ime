@@ -32,6 +32,12 @@ internal fun flushGreedy(dict: Map<String, Int>, buffer: StringBuilder): List<St
     return out
 }
 
+/** ラテン転写の複合子音（CV 化は [glyphForClusterWithEpenthesis]）。長いものを先に照合する。 */
+private val consonantClusters: List<String> =
+    listOf(
+        "sh",
+    )
+
 private fun flushGreedySingleSegment(
     dict: Map<String, Int>,
     buffer: StringBuilder,
@@ -40,15 +46,73 @@ private fun flushGreedySingleSegment(
     while (buffer.isNotEmpty()) {
         val b = buffer.toString()
         val m = dict.keys.filter { b.startsWith(it) }.maxByOrNull { it.length }
-        if (m == null) {
-            out.add(buffer[0].toString())
-            buffer.deleteAt(0)
-        } else {
+        if (m != null) {
             out.add(glyphFor(dict.getValue(m)))
             buffer.delete(0, m.length)
+            continue
+        }
+        // 辞書に先頭から合うキーがないとき、いずれかのキーの接頭辞になっている最長部分はまだ伸びうるので
+        // その分だけラテンにまとめる。その後、単独子音なら仮母音（e,a,i,u）で楔形化を試みる。
+        var len = buffer.length
+        while (len > 0 && dict.keys.any { key -> key.startsWith(buffer.substring(0, len)) }) {
+            len--
+        }
+        if (len <= 0) {
+            val cluster =
+                consonantClusters.firstOrNull { c ->
+                    buffer.startsWith(c) && buffer.length == c.length
+                }
+            if (cluster != null) {
+                buffer.delete(0, cluster.length)
+                out.add(glyphForClusterWithEpenthesis(cluster, dict) ?: cluster)
+            } else {
+                val lone = buffer[0]
+                buffer.deleteAt(0)
+                val glyph =
+                    if (lone in 'a'..'z' && lone !in "aeiou") {
+                        glyphForConsonantWithEpenthesis(lone, dict)
+                    } else {
+                        null
+                    }
+                out.add(glyph ?: lone.toString())
+            }
+        } else {
+            val chunk = buffer.substring(0, len)
+            buffer.delete(0, len)
+            val glyph =
+                when {
+                    consonantClusters.contains(chunk) -> glyphForClusterWithEpenthesis(chunk, dict)
+                    len == 1 && chunk[0] in 'a'..'z' && chunk[0] !in "aeiou" ->
+                        glyphForConsonantWithEpenthesis(chunk[0], dict)
+                    else -> null
+                }
+            out.add(glyph ?: chunk)
         }
     }
     return out
+}
+
+/**
+ * 子音のみが残ったとき、仮の母音を e,a,i,u の順に付けて辞書にある音節に変換（CV 形）。
+ * 符号は「その C+V 転写で通じる」ものを選ぶ（別音価マップ含む）。
+ */
+private fun glyphForConsonantWithEpenthesis(c: Char, dict: Map<String, Int>): String? {
+    if (c !in 'a'..'z' || c in "aeiou") return null
+    for (v in listOf('e', 'a', 'i', 'u')) {
+        dict["$c$v"]?.let { return glyphFor(it) }
+    }
+    return null
+}
+
+/**
+ * [consonantClusters]（例: sh）だけが残ったとき、**sh**e → **sh**a → … と単子音と同様に仮母音を付与。
+ */
+private fun glyphForClusterWithEpenthesis(cluster: String, dict: Map<String, Int>): String? {
+    if (cluster.isEmpty()) return null
+    for (v in listOf('e', 'a', 'i', 'u')) {
+        dict["$cluster$v"]?.let { return glyphFor(it) }
+    }
+    return null
 }
 
 /**
@@ -81,6 +145,18 @@ private fun consumeIncremental(
         if (asPrefixOfBuffer.isEmpty()) {
             val couldGrow = keys.any { it.startsWith(b) }
             if (couldGrow) break
+            val cluster =
+                consonantClusters.firstOrNull { c ->
+                    b.startsWith(c) && b.length == c.length
+                }
+            if (cluster != null) {
+                val gCluster = glyphForClusterWithEpenthesis(cluster, dict)
+                if (gCluster != null) {
+                    committed.add(gCluster)
+                    buffer.delete(0, cluster.length)
+                    continue
+                }
+            }
             committed.add(buffer[0].toString())
             buffer.deleteAt(0)
             continue
