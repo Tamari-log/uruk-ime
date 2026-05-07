@@ -18,24 +18,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 import androidx.compose.material.icons.filled.Circle
-import androidx.compose.material.icons.filled.KeyboardCapslock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.belleval.enmerkar.type.R
 import com.belleval.enmerkar.type.sumerian.SumerianTransliteration
 import com.belleval.enmerkar.type.sumerian.appendLatinRaw
 import com.belleval.enmerkar.type.sumerian.digitBufferToCuneiformClusters
@@ -69,7 +69,7 @@ fun AlphabetCuneiformKeyboard(
 ) {
     val view = LocalView.current
     val dict = SumerianTransliteration.readingToCodepoint
-    var capsOn by remember { mutableStateOf(false) }
+    val hyphenCd = stringResource(R.string.ime_key_hyphen)
 
     fun haptic() {
         if (hapticOnKeypress) {
@@ -168,7 +168,6 @@ fun AlphabetCuneiformKeyboard(
                 keyHeight = keyHeight,
                 cornerDp = cornerDp,
                 showKeyBorders = showKeyBorders,
-                capsOn = capsOn,
                 onLetter = { key ->
                     haptic()
                     val ch = key.main
@@ -193,7 +192,6 @@ fun AlphabetCuneiformKeyboard(
                 keyHeight = keyHeight,
                 cornerDp = cornerDp,
                 showKeyBorders = showKeyBorders,
-                capsOn = capsOn,
                 onLetter = { key ->
                     haptic()
                     val ch = key.main
@@ -224,13 +222,18 @@ fun AlphabetCuneiformKeyboard(
                     showBorder = showKeyBorders,
                     onClick = {
                         haptic()
-                        capsOn = !capsOn
+                        val sb = StringBuilder(rawBuffer)
+                        appendLatinRaw(sb, '-')
+                        onRawBufferChange(sb.toString())
                     },
                 ) {
-                    Icon(
-                        Icons.Default.KeyboardCapslock,
-                        contentDescription = null,
-                        tint = if (capsOn) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    Text(
+                        text = "-",
+                        modifier = Modifier.semantics { contentDescription = hyphenCd },
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
                 KeyRow(
@@ -239,7 +242,6 @@ fun AlphabetCuneiformKeyboard(
                     keyHeight = keyHeight,
                     cornerDp = cornerDp,
                     showKeyBorders = showKeyBorders,
-                    capsOn = capsOn,
                     onLetter = { key ->
                         haptic()
                         val ch = key.main
@@ -326,7 +328,6 @@ private fun KeyRow(
     keyHeight: Dp,
     cornerDp: Dp,
     showKeyBorders: Boolean,
-    capsOn: Boolean,
     onLetter: (LetterKey) -> Unit,
 ) {
     Row(
@@ -340,7 +341,6 @@ private fun KeyRow(
                 height = keyHeight,
                 cornerDp = cornerDp,
                 showKeyBorders = showKeyBorders,
-                capsOn = capsOn,
                 onClick = { onLetter(key) },
             )
         }
@@ -354,7 +354,6 @@ private fun LetterKeyChip(
     height: Dp,
     cornerDp: Dp,
     showKeyBorders: Boolean,
-    capsOn: Boolean,
     onClick: () -> Unit,
 ) {
     val shape = RoundedCornerShape(cornerDp)
@@ -373,8 +372,6 @@ private fun LetterKeyChip(
     val display =
         if (key.main == '\'') {
             "'"
-        } else if (capsOn) {
-            key.main.uppercaseChar().toString()
         } else {
             key.main.toString()
         }

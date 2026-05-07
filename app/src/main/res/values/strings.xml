@@ -56,5 +56,6 @@
     <string name="ime_subtype_label">Uruk IME</string>
     <string name="ime_keyboard_label">Uruk IME キーボード</string>
     <string name="ime_hide_keyboard">キーボードを閉じる</string>
+    <string name="ime_key_hyphen">ハイフン。音節境界（例: ma-e）</string>
     <string name="action_delete">1 文字削除</string>
 </resources>
