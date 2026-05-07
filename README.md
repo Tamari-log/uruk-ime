@@ -34,7 +34,7 @@ Unicode の楔形文字ブロック（U+12000 台・U+12400 台など）を、�
 ```
 
 生成 AAB: `app/build/outputs/bundle/release/app-release.aab`  
-（`keystore.properties` とリリース用キーストアを用意したうえで署名されます。未設定の場合は debug キーで署名され、本番提出には不適切です。）
+（本番提出には Android のリリース署名が必要です。手元のキーストアで `app/build.gradle.kts` の設定に合わせてください。未設定の場合、Gradle は debug キーで署名します。）
 
 ### ローカル検証（デバッグ APK）
 
@@ -68,7 +68,6 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ## 開発メモ
 
-- `scripts/` にログ取得用 PowerShell があります（`Capture-UrukImeLogcat.ps1`）。
 - IME 実装: `app/src/main/java/com/belleval/enmerkar/type/`
 
 ---
