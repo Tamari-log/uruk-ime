@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.belleval.enmerkar.type.sumerian.SumerianTransliteration
-import com.belleval.enmerkar.type.sumerian.appendLatinAndConsume
+import com.belleval.enmerkar.type.sumerian.appendLatinRaw
 import com.belleval.enmerkar.type.sumerian.digitBufferToCuneiformClusters
 import com.belleval.enmerkar.type.sumerian.flushGreedy
 
@@ -175,14 +175,8 @@ fun AlphabetCuneiformKeyboard(
                     when {
                         ch.lowercaseChar() in 'a'..'z' -> {
                             val sb = StringBuilder(rawBuffer)
-                            val g =
-                                appendLatinAndConsume(
-                                    dict,
-                                    sb,
-                                    ch.lowercaseChar(),
-                                )
+                            appendLatinRaw(sb, ch.lowercaseChar())
                             onRawBufferChange(sb.toString())
-                            g.forEach(onCommitGlyph)
                         }
                         else -> {
                             for (g in commitFlushedLatin()) {
@@ -206,14 +200,8 @@ fun AlphabetCuneiformKeyboard(
                     when {
                         ch.lowercaseChar() in 'a'..'z' -> {
                             val sb = StringBuilder(rawBuffer)
-                            val g =
-                                appendLatinAndConsume(
-                                    dict,
-                                    sb,
-                                    ch.lowercaseChar(),
-                                )
+                            appendLatinRaw(sb, ch.lowercaseChar())
                             onRawBufferChange(sb.toString())
-                            g.forEach(onCommitGlyph)
                         }
                         else -> {
                             for (g in commitFlushedLatin()) {
@@ -256,14 +244,8 @@ fun AlphabetCuneiformKeyboard(
                         haptic()
                         val ch = key.main
                         val sb = StringBuilder(rawBuffer)
-                        val g =
-                            appendLatinAndConsume(
-                                dict,
-                                sb,
-                                ch.lowercaseChar(),
-                            )
+                        appendLatinRaw(sb, ch.lowercaseChar())
                         onRawBufferChange(sb.toString())
-                        g.forEach(onCommitGlyph)
                     },
                 )
                 ModifierKey(

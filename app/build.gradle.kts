@@ -22,13 +22,15 @@ val hasReleaseKeystore: Boolean =
 android {
     namespace = "com.belleval.enmerkar.type"
     compileSdk = 35
+    // ネイティブ・デバッグシンボル抽出（native-debug-symbols.zip）用。SDK Manager で入っている NDK と一致させる。
+    ndkVersion = "26.1.10909125"
 
     defaultConfig {
         applicationId = "com.belleval.enmerkar.type"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.0.3"
+        versionCode = 5
+        versionName = "1.0.4"
     }
 
     signingConfigs {
@@ -47,7 +49,8 @@ android {
             isMinifyEnabled = false
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig =
                 if (hasReleaseKeystore) {
                     signingConfigs.getByName("release")
@@ -61,6 +64,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
     }
     compileOptions {
