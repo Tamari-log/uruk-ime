@@ -8,6 +8,10 @@ Unicode の楔形文字ブロック（U+12000 台・U+12400 台など）を、�
 **リポジトリ（GitHub）**: https://github.com/Tamari-log/uruk-ime  
 （リネーム前は `CuneiformInput` でした。古い URL のリダイレクトは GitHub 設定に依存します。）
 
+## Google Play クローズドテスト
+
+https://play.google.com/store/apps/details?id=com.belleval.enmerkar.type
+
 ## 機能（概要）
 
 | | |
