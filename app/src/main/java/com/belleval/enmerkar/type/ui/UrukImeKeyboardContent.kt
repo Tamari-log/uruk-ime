@@ -145,12 +145,22 @@ fun UrukImeKeyboardContent(
             }
         }
 
-    val mainBlock = remember { cuneiformCodePoints(0x12000..0x123FF) }
-    val numberBlock = remember { cuneiformCodePoints(0x12400..0x1247F) }
+    var mainBlockCache by remember { mutableStateOf<List<Int>?>(null) }
+    var numberBlockCache by remember { mutableStateOf<List<Int>?>(null) }
     val activePoints =
         when (tabIndex) {
-            TAB_MAIN -> mainBlock
-            TAB_NUMBERS -> numberBlock
+            TAB_MAIN -> {
+                if (mainBlockCache == null) {
+                    mainBlockCache = cuneiformCodePoints(0x12000..0x123FF)
+                }
+                mainBlockCache
+            }
+            TAB_NUMBERS -> {
+                if (numberBlockCache == null) {
+                    numberBlockCache = cuneiformCodePoints(0x12400..0x1247F)
+                }
+                numberBlockCache
+            }
             else -> null
         }
 
@@ -244,7 +254,10 @@ fun UrukImeKeyboardContent(
                 )
             }
             else -> {
-                val gridPoints = activePoints ?: mainBlock
+                if (mainBlockCache == null) {
+                    mainBlockCache = cuneiformCodePoints(0x12000..0x123FF)
+                }
+                val gridPoints = activePoints ?: mainBlockCache.orEmpty()
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = gridMinCellDp.dp),
                     modifier =

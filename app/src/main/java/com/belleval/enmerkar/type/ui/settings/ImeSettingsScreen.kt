@@ -50,6 +50,7 @@ import com.belleval.enmerkar.type.prefs.ThemeMode
 import com.belleval.enmerkar.type.prefs.setImeDefaultTabIndex
 import com.belleval.enmerkar.type.prefs.setImeHapticOnKeypress
 import com.belleval.enmerkar.type.prefs.setImeKeySizeMode
+import com.belleval.enmerkar.type.prefs.setImePersistTimingLogs
 import com.belleval.enmerkar.type.prefs.setImeShowKeyBorders
 import com.belleval.enmerkar.type.prefs.setImeThemeMode
 import kotlinx.coroutines.CoroutineScope
@@ -199,6 +200,17 @@ fun ImeSettingsScreen(
                     subtitle = stringResource(R.string.settings_diagnostic_log_sub),
                     icon = Icons.Default.BugReport,
                     onClick = onOpenDiagnosticLog,
+                )
+            }
+            item {
+                SettingsToggleCard(
+                    title = stringResource(R.string.settings_persist_timing_logs),
+                    subtitle = stringResource(R.string.settings_persist_timing_logs_sub),
+                    icon = Icons.Default.Info,
+                    checked = prefs.persistTimingLogs,
+                    onCheckedChange = { v ->
+                        scope.launch { context.setImePersistTimingLogs(v) }
+                    },
                 )
             }
             item {

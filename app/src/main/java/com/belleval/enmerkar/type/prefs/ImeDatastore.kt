@@ -22,6 +22,7 @@ private val KEY_SETTINGS_VERSION = intPreferencesKey("settings_version")
 private val KEY_KEY_SIZE = stringPreferencesKey("key_size")
 private val KEY_SHOW_BORDERS = booleanPreferencesKey("show_key_borders")
 private val KEY_THEME = stringPreferencesKey("theme_mode")
+private val KEY_PERSIST_TIMING_LOGS = booleanPreferencesKey("persist_timing_logs")
 
 val Context.imeDataStore by preferencesDataStore(
     name = "uruk_ime_settings",
@@ -83,6 +84,7 @@ data class ImeUserPrefs(
     val keySizeMode: KeySizeMode,
     val showKeyBorders: Boolean,
     val themeMode: ThemeMode,
+    val persistTimingLogs: Boolean,
 ) {
     fun gridMinCellDp(): Float =
         when (keySizeMode) {
@@ -113,6 +115,7 @@ data class ImeUserPrefs(
                 keySizeMode = KeySizeMode.STANDARD,
                 showKeyBorders = true,
                 themeMode = ThemeMode.SYSTEM,
+                persistTimingLogs = false,
             )
     }
 }
@@ -135,6 +138,7 @@ fun Preferences.toImeUserPrefs(): ImeUserPrefs {
         keySizeMode = KeySizeMode.fromStorage(this[KEY_KEY_SIZE]),
         showKeyBorders = this[KEY_SHOW_BORDERS] ?: true,
         themeMode = ThemeMode.fromStorage(this[KEY_THEME]),
+        persistTimingLogs = this[KEY_PERSIST_TIMING_LOGS] ?: false,
     )
 }
 
@@ -147,35 +151,42 @@ fun ImeUserPrefs.darkThemeFlag(systemIsDark: Boolean): Boolean =
 
 suspend fun Context.setImeHapticOnKeypress(enabled: Boolean) {
     applicationContext.imeDataStore.edit {
-        it[KEY_SETTINGS_VERSION] = 3
+        it[KEY_SETTINGS_VERSION] = 4
         it[KEY_HAPTIC] = enabled
     }
 }
 
 suspend fun Context.setImeDefaultTabIndex(index: Int) {
     applicationContext.imeDataStore.edit {
-        it[KEY_SETTINGS_VERSION] = 3
+        it[KEY_SETTINGS_VERSION] = 4
         it[KEY_DEFAULT_TAB] = index.coerceIn(0, 3)
     }
 }
 
 suspend fun Context.setImeKeySizeMode(mode: KeySizeMode) {
     applicationContext.imeDataStore.edit {
-        it[KEY_SETTINGS_VERSION] = 3
+        it[KEY_SETTINGS_VERSION] = 4
         it[KEY_KEY_SIZE] = mode.toStorageString()
     }
 }
 
 suspend fun Context.setImeShowKeyBorders(show: Boolean) {
     applicationContext.imeDataStore.edit {
-        it[KEY_SETTINGS_VERSION] = 3
+        it[KEY_SETTINGS_VERSION] = 4
         it[KEY_SHOW_BORDERS] = show
     }
 }
 
 suspend fun Context.setImeThemeMode(mode: ThemeMode) {
     applicationContext.imeDataStore.edit {
-        it[KEY_SETTINGS_VERSION] = 3
+        it[KEY_SETTINGS_VERSION] = 4
         it[KEY_THEME] = mode.name.lowercase()
+    }
+}
+
+suspend fun Context.setImePersistTimingLogs(enabled: Boolean) {
+    applicationContext.imeDataStore.edit {
+        it[KEY_SETTINGS_VERSION] = 4
+        it[KEY_PERSIST_TIMING_LOGS] = enabled
     }
 }

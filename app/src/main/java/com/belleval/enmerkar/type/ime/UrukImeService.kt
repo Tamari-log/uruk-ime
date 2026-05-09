@@ -1,6 +1,8 @@
 package com.belleval.enmerkar.type.ime
 
 import android.os.Build
+import android.os.SystemClock
+import android.util.Log
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
@@ -9,11 +11,15 @@ import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -24,12 +30,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -57,10 +65,38 @@ private const val TAG_IME = "UrukIme"
 class UrukImeService : LifecycleInputMethodService() {
 
     private var composeInputRoot: View? = null
+    private var serviceCreatedAtMs: Long = 0L
+    private var inputViewCreatedAtMs: Long = 0L
+    @Volatile
+    private var persistTimingLogs: Boolean = false
+
+    private fun timing(label: String) {
+        val now = SystemClock.elapsedRealtime()
+        val fromServiceCreate =
+            if (serviceCreatedAtMs > 0L) {
+                "${now - serviceCreatedAtMs}ms"
+            } else {
+                "n/a"
+            }
+        val fromInputViewCreate =
+            if (inputViewCreatedAtMs > 0L) {
+                "${now - inputViewCreatedAtMs}ms"
+            } else {
+                "n/a"
+            }
+        val msg =
+            "timing: $label | tSinceServiceCreate=$fromServiceCreate | tSinceInputViewCreate=$fromInputViewCreate"
+        Log.i(TAG_IME, msg)
+        if (persistTimingLogs) {
+            DiagnosticLog.i(TAG_IME, msg)
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
+        serviceCreatedAtMs = SystemClock.elapsedRealtime()
         DiagnosticLog.i(TAG_IME, "UrukImeService onCreate")
+        timing("onCreate")
         setExtractViewShown(false)
         window?.window?.let { w ->
             WindowCompat.setDecorFitsSystemWindows(w, false)
@@ -70,6 +106,7 @@ class UrukImeService : LifecycleInputMethodService() {
 
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
+        timing("onStartInputView(restarting=$restarting)")
         applyImeWindowLayout()
         composeInputRoot?.post { composeInputRoot?.requestLayout() }
     }
@@ -101,10 +138,13 @@ class UrukImeService : LifecycleInputMethodService() {
 
     override fun onCreateInputView(): View? {
         return try {
+            timing("onCreateInputView:start")
             installViewTreeOwners()
             applyImeWindowLayout()
             val compose = buildKeyboardComposeView()
             composeInputRoot = compose
+            inputViewCreatedAtMs = SystemClock.elapsedRealtime()
+            timing("onCreateInputView:end")
             compose
         } catch (t: Throwable) {
             DiagnosticLog.e(TAG_IME, "onCreateInputView failed", t)
@@ -117,8 +157,18 @@ class UrukImeService : LifecycleInputMethodService() {
             setViewCompositionStrategy(DisposeOnLifecycleDestroyed(lifecycle))
             setContent {
                 var prefs by remember { mutableStateOf(ImeUserPrefs.DEFAULT) }
+                var showFullKeyboard by remember { mutableStateOf(false) }
                 LaunchedEffect(Unit) {
-                    applicationContext.imeUserPrefsFlow().collect { prefs = it }
+                    applicationContext.imeUserPrefsFlow().collect {
+                        prefs = it
+                        persistTimingLogs = it.persistTimingLogs
+                    }
+                }
+                LaunchedEffect(Unit) {
+                    timing("compose:initial-shell")
+                    withFrameNanos { }
+                    showFullKeyboard = true
+                    timing("compose:full-keyboard")
                 }
                 val systemDark = isSystemInDarkTheme()
                 val darkTheme = prefs.darkThemeFlag(systemDark)
@@ -133,6 +183,7 @@ class UrukImeService : LifecycleInputMethodService() {
                         color = MaterialTheme.colorScheme.surface,
                         tonalElevation = 3.dp,
                     ) {
+                        timing("compose:Surface")
                         Column(
                             modifier =
                                 Modifier
@@ -187,26 +238,36 @@ class UrukImeService : LifecycleInputMethodService() {
                                 }
                             }
                             HorizontalDivider()
-                            UrukImeKeyboardContent(
-                                tabIndex = tabIndex,
-                                onTabChange = { tabIndex = it },
-                                onGlyphSelected = { ch ->
-                                    val ic = currentInputConnection ?: return@UrukImeKeyboardContent
-                                    ic.tryCommitGlyphText(ch)
-                                },
-                                onBackspace = {
-                                    val ic = currentInputConnection ?: return@UrukImeKeyboardContent
-                                    val before = ic.getTextBeforeCursor(8, 0) ?: return@UrukImeKeyboardContent
-                                    val n = before.utf16LengthOfLastCodePoint()
-                                    if (n > 0) ic.deleteSurroundingText(n, 0)
-                                },
-                                onEditorEnter = { performEditorEnter() },
-                                keyboardAreaHeightDp = prefs.keyboardSurfaceHeightDp(),
-                                hapticOnKeypress = prefs.hapticOnKeypress,
-                                gridMinCellDp = prefs.gridMinCellDp(),
-                                gridCellHeightDp = prefs.gridCellHeightDp(),
-                                showKeyBorders = prefs.showKeyBorders,
-                            )
+                            if (showFullKeyboard) {
+                                UrukImeKeyboardContent(
+                                    tabIndex = tabIndex,
+                                    onTabChange = { tabIndex = it },
+                                    onGlyphSelected = { ch ->
+                                        val ic = currentInputConnection ?: return@UrukImeKeyboardContent
+                                        ic.tryCommitGlyphText(ch)
+                                    },
+                                    onBackspace = {
+                                        val ic = currentInputConnection ?: return@UrukImeKeyboardContent
+                                        val before = ic.getTextBeforeCursor(8, 0) ?: return@UrukImeKeyboardContent
+                                        val n = before.utf16LengthOfLastCodePoint()
+                                        if (n > 0) ic.deleteSurroundingText(n, 0)
+                                    },
+                                    onEditorEnter = { performEditorEnter() },
+                                    keyboardAreaHeightDp = prefs.keyboardSurfaceHeightDp(),
+                                    hapticOnKeypress = prefs.hapticOnKeypress,
+                                    gridMinCellDp = prefs.gridMinCellDp(),
+                                    gridCellHeightDp = prefs.gridCellHeightDp(),
+                                    showKeyBorders = prefs.showKeyBorders,
+                                )
+                            } else {
+                                WarmupShell(
+                                    keyboardHeightDp = prefs.keyboardSurfaceHeightDp(),
+                                    onSpace = {
+                                        currentInputConnection?.commitText(" ", 1)
+                                    },
+                                    onEnter = { performEditorEnter() },
+                                )
+                            }
                         }
                     }
                 }
@@ -223,6 +284,61 @@ class UrukImeService : LifecycleInputMethodService() {
         } else {
             ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
             ic.sendKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_ENTER))
+        }
+    }
+}
+
+@Composable
+private fun WarmupShell(
+    keyboardHeightDp: Float,
+    onSpace: () -> Unit,
+    onEnter: () -> Unit,
+) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(keyboardHeightDp.dp)
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.ime_starting),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+        )
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = 40.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                onClick = onSpace,
+                tonalElevation = 1.dp,
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    text = stringResource(R.string.ime_quick_space),
+                    modifier = Modifier.padding(vertical = 10.dp),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+            Surface(
+                onClick = onEnter,
+                tonalElevation = 1.dp,
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    text = stringResource(R.string.ime_quick_enter),
+                    modifier = Modifier.padding(vertical = 10.dp),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
         }
     }
 }

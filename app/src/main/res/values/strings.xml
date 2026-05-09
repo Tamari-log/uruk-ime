@@ -29,6 +29,8 @@
     <string name="settings_section_about">このアプリについて</string>
     <string name="settings_diagnostic_log_title">診断ログ</string>
     <string name="settings_diagnostic_log_sub">エラーや不具合の履歴を確認・共有します（入力した文字は記録しません）</string>
+    <string name="settings_persist_timing_logs">起動計測ログを保存</string>
+    <string name="settings_persist_timing_logs_sub">通常はOFF推奨。ONでIME切替の時刻ログを診断ログにも保存します</string>
 
     <string name="diagnostic_log_title">診断ログ</string>
     <string name="diagnostic_back">戻る</string>
@@ -55,6 +57,9 @@
     <string name="ime_label">Uruk IME</string>
     <string name="ime_subtype_label">Uruk IME</string>
     <string name="ime_keyboard_label">Uruk IME キーボード</string>
+    <string name="ime_starting">起動中…すぐ入力できます</string>
+    <string name="ime_quick_space">空白</string>
+    <string name="ime_quick_enter">改行</string>
     <string name="ime_hide_keyboard">キーボードを閉じる</string>
     <string name="ime_key_hyphen">ハイフン。音節境界（例: ma-e）</string>
     <string name="action_delete">1 文字削除</string>
