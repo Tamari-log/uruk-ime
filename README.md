@@ -11,7 +11,9 @@ Unicode の楔形文字ブロック（U+12000 台・U+12400 台など）を、�
 ## Google Play クローズドテスト
 
 https://play.google.com/store/apps/details?id=com.belleval.enmerkar.type
-もしこのリンクからテストに参加する場合はGoogle Playで使用するメールアドレスで私宛（sa.u.20060202@gmail.com）に空メールを送ってください
+
+もしこのリンクからテストに参加する場合はGoogle Playで使用するメールアドレスで私宛（sa.u.20060202@gmail.com）に空メールを送ってください。
+
 一日ほどでクローズドテストユーザーに追加いたします
 
 ## 機能（概要）
