@@ -9,6 +9,9 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -40,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnLifecycleDestroyed
@@ -54,8 +58,12 @@ import com.belleval.enmerkar.type.prefs.imeUserPrefsFlow
 import com.belleval.enmerkar.type.ui.UrukImeKeyboardContent
 import com.belleval.enmerkar.type.ui.theme.UrukImeTheme
 import com.belleval.enmerkar.type.utf16LengthOfLastCodePoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeoutOrNull
 
 private const val TAG_IME = "UrukIme"
+private const val DELETE_REPEAT_START_DELAY_MS = 350L
+private const val DELETE_REPEAT_INTERVAL_MS = 45L
 
 /**
  * [onCreateInputView] でキーボード [View] を返し、[InputMethodService] の inputArea（[android.R.id.inputArea]）に載せる。
@@ -198,6 +206,12 @@ class UrukImeService : LifecycleInputMethodService() {
                                         .padding(horizontal = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
+                                fun deleteOnce() {
+                                    val ic = currentInputConnection ?: return
+                                    val before = ic.getTextBeforeCursor(8, 0) ?: return
+                                    val n = before.utf16LengthOfLastCodePoint()
+                                    if (n > 0) ic.deleteSurroundingText(n, 0)
+                                }
                                 Text(
                                     text = stringResource(R.string.ime_keyboard_label),
                                     style = MaterialTheme.typography.labelMedium,
@@ -207,22 +221,13 @@ class UrukImeService : LifecycleInputMethodService() {
                                             .weight(1f)
                                             .padding(start = 8.dp),
                                 )
-                                IconButton(
-                                    onClick = {
-                                        if (prefs.hapticOnKeypress) {
-                                            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                                        }
-                                        val ic = currentInputConnection ?: return@IconButton
-                                        val before = ic.getTextBeforeCursor(8, 0) ?: return@IconButton
-                                        val n = before.utf16LengthOfLastCodePoint()
-                                        if (n > 0) ic.deleteSurroundingText(n, 0)
+                                RepeatDeleteIconButton(
+                                    hapticOnKeypress = prefs.hapticOnKeypress,
+                                    onDeleteOnce = { deleteOnce() },
+                                    onHaptic = {
+                                        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                                     },
-                                ) {
-                                    Icon(
-                                        Icons.Default.Delete,
-                                        contentDescription = stringResource(R.string.action_delete),
-                                    )
-                                }
+                                )
                                 IconButton(
                                     onClick = {
                                         if (prefs.hapticOnKeypress) {
@@ -276,6 +281,14 @@ class UrukImeService : LifecycleInputMethodService() {
 
     override fun onEvaluateFullscreenMode(): Boolean = false
 
+    override fun onFinishInputView(finishingInput: Boolean) {
+        super.onFinishInputView(finishingInput)
+    }
+
+    override fun onFinishInput() {
+        super.onFinishInput()
+    }
+
     private fun performEditorEnter() {
         val ic = currentInputConnection ?: return
         ic.finishComposingText()
@@ -287,6 +300,64 @@ class UrukImeService : LifecycleInputMethodService() {
         }
     }
 }
+
+@Composable
+private fun RepeatDeleteIconButton(
+    hapticOnKeypress: Boolean,
+    onDeleteOnce: () -> Unit,
+    onHaptic: () -> Unit,
+) {
+    var repeating by remember { mutableStateOf(false) }
+    LaunchedEffect(repeating) {
+        if (!repeating) return@LaunchedEffect
+        while (repeating) {
+            delay(DELETE_REPEAT_INTERVAL_MS)
+            onDeleteOnce()
+        }
+    }
+    Icon(
+        imageVector = Icons.Default.Delete,
+        contentDescription = stringResource(R.string.action_delete),
+        modifier =
+            Modifier
+                .padding(horizontal = 12.dp, vertical = 10.dp)
+                .awaitRepeatDeleteGesture(
+                    onSingleTapDelete = {
+                        if (hapticOnKeypress) onHaptic()
+                        onDeleteOnce()
+                    },
+                    onRepeatStart = {
+                        if (hapticOnKeypress) onHaptic()
+                        onDeleteOnce()
+                        repeating = true
+                    },
+                    onRepeatStop = { repeating = false },
+                ),
+    )
+}
+
+private fun Modifier.awaitRepeatDeleteGesture(
+    onSingleTapDelete: () -> Unit,
+    onRepeatStart: () -> Unit,
+    onRepeatStop: () -> Unit,
+): Modifier =
+    pointerInput(Unit) {
+        awaitEachGesture {
+            val down = awaitFirstDown()
+            val tapUp = withTimeoutOrNull(DELETE_REPEAT_START_DELAY_MS) { waitForUpOrCancellation() }
+            if (tapUp != null) {
+                onSingleTapDelete()
+                down.consume()
+                tapUp.consume()
+                return@awaitEachGesture
+            }
+            onRepeatStart()
+            val longPressUp = waitForUpOrCancellation()
+            onRepeatStop()
+            down.consume()
+            longPressUp?.consume()
+        }
+    }
 
 @Composable
 private fun WarmupShell(

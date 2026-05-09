@@ -4,7 +4,8 @@
     android:supportsSwitchingToNextInputMethod="true">
     <subtype
         android:label="@string/ime_subtype_label"
-        android:imeSubtypeLocale="ja_JP"
+        android:imeSubtypeLocale="und"
+        android:languageTag="und"
         android:imeSubtypeMode="keyboard"
         android:isAsciiCapable="true" />
 </input-method>
