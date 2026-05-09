@@ -28,6 +28,8 @@ release/
 # ルートや作業用に置いた配布物
 /*.apk
 /*.aab
+/*.apks
+*.idsig
 
 # --- IDE / OS ---
 .idea/

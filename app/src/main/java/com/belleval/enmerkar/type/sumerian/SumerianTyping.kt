@@ -26,6 +26,11 @@ internal fun flushGreedy(dict: Map<String, Int>, buffer: StringBuilder): List<St
     val out = mutableListOf<String>()
     for (part in text.split('-')) {
         if (part.isEmpty()) continue
+        val preferred = preferredWholeSegmentTokenization(part, dict)
+        if (preferred != null) {
+            out.addAll(preferred.map { glyphFor(dict.getValue(it)) })
+            continue
+        }
         val seg = StringBuilder(part)
         out.addAll(flushGreedySingleSegment(dict, seg))
     }
@@ -90,6 +95,69 @@ private fun flushGreedySingleSegment(
         }
     }
     return out
+}
+
+private data class WholeSegmentTokenization(
+    val tokens: List<String>,
+    val closedSyllableCount: Int,
+)
+
+/**
+ * セグメント全体を辞書キーだけで分割できる場合、語末子音で閉じる音節（VC/CVC）を最小化する。
+ * 同点時はトークン数が少ない方を優先し、IME として自然な `a-na` 系の分割を選びやすくする。
+ */
+private fun preferredWholeSegmentTokenization(
+    segment: String,
+    dict: Map<String, Int>,
+): List<String>? {
+    if (segment.isEmpty()) return emptyList()
+    val memo = mutableMapOf<Int, WholeSegmentTokenization?>()
+    val vowels = "aeiou"
+    val keysByHead: Map<Char, List<String>> =
+        dict.keys.groupBy { it.firstOrNull() ?: '\u0000' }
+
+    fun isBetter(
+        candidate: WholeSegmentTokenization,
+        best: WholeSegmentTokenization?,
+    ): Boolean {
+        if (best == null) return true
+        if (candidate.closedSyllableCount != best.closedSyllableCount) {
+            return candidate.closedSyllableCount < best.closedSyllableCount
+        }
+        if (candidate.tokens.size != best.tokens.size) {
+            return candidate.tokens.size < best.tokens.size
+        }
+        return candidate.tokens.joinToString("") < best.tokens.joinToString("")
+    }
+
+    fun solve(index: Int): WholeSegmentTokenization? {
+        if (memo.containsKey(index)) return memo[index]
+        if (index == segment.length) {
+            val done = WholeSegmentTokenization(emptyList(), 0)
+            memo[index] = done
+            return done
+        }
+        val head = segment[index]
+        val candidates = keysByHead[head].orEmpty()
+        var best: WholeSegmentTokenization? = null
+        for (key in candidates) {
+            if (!segment.startsWith(key, index)) continue
+            val suffix = solve(index + key.length) ?: continue
+            val closed = if (key.last() in vowels) 0 else 1
+            val tokenized =
+                WholeSegmentTokenization(
+                    tokens = listOf(key) + suffix.tokens,
+                    closedSyllableCount = closed + suffix.closedSyllableCount,
+                )
+            if (isBetter(tokenized, best)) {
+                best = tokenized
+            }
+        }
+        memo[index] = best
+        return best
+    }
+
+    return solve(0)?.tokens
 }
 
 /**

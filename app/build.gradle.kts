@@ -29,7 +29,7 @@ android {
         applicationId = "com.belleval.enmerkar.type"
         minSdk = 26
         targetSdk = 35
-        versionCode = 6
+        versionCode = 7
         versionName = "1.0.5"
     }
 
@@ -102,4 +102,5 @@ dependencies {
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    testImplementation("junit:junit:4.13.2")
 }
