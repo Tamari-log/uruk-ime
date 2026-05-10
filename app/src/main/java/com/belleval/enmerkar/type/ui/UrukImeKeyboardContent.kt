@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -51,6 +52,8 @@ private const val TAB_MAIN = 1
 private const val TAB_NUMBERS = 2
 private const val TAB_INFLECT = 3
 private const val TAB_LAST = TAB_INFLECT
+private const val CUNEIFORM_HEADER_HEIGHT_DP = 30f
+private const val NON_ALPHABET_BOTTOM_SAFE_PADDING_DP = 42f
 
 @Composable
 private fun ImeComposingStrip(text: String) {
@@ -235,64 +238,128 @@ fun UrukImeKeyboardContent(
                 }
             }
             TAB_INFLECT -> {
-                InflectionKeyboardPanel(
+                val inflectPanelHeightDp =
+                    (keyboardAreaHeightDp - NON_ALPHABET_BOTTOM_SAFE_PADDING_DP).coerceAtLeast(120f)
+                Column(
                     modifier =
                         Modifier
                             .fillMaxWidth()
                             .height(keyboardAreaHeightDp.dp),
-                    gridMinCellDp = gridMinCellDp,
-                    gridCellHeightDp = gridCellHeightDp,
-                    showKeyBorders = showKeyBorders,
-                    onAppendLatin = { piece ->
-                        haptic()
-                        alphabetRawBuffer += piece
-                    },
-                    onConfirmFlush = {
-                        haptic()
-                        flushTransliterationBuffers()
-                    },
-                )
+                ) {
+                    InflectionKeyboardPanel(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(inflectPanelHeightDp.dp),
+                        gridMinCellDp = gridMinCellDp,
+                        gridCellHeightDp = gridCellHeightDp,
+                        showKeyBorders = showKeyBorders,
+                        onAppendLatin = { piece ->
+                            haptic()
+                            alphabetRawBuffer += piece
+                        },
+                        onConfirmFlush = {
+                            haptic()
+                            flushTransliterationBuffers()
+                        },
+                    )
+                    // スクロール領域とは独立した固定フッター領域（システムUI重なり回避）
+                    Spacer(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(NON_ALPHABET_BOTTOM_SAFE_PADDING_DP.dp),
+                    )
+                }
             }
             else -> {
                 if (mainBlockCache == null) {
                     mainBlockCache = cuneiformCodePoints(0x12000..0x123FF)
                 }
                 val gridPoints = activePoints ?: mainBlockCache.orEmpty()
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = gridMinCellDp.dp),
+                val cuneiformHeaderLabel =
+                    if (tabIndex == TAB_NUMBERS) {
+                        stringResource(R.string.tab_numbers)
+                    } else {
+                        stringResource(R.string.tab_main)
+                    }
+                val gridHeightDp =
+                    (
+                        keyboardAreaHeightDp -
+                            CUNEIFORM_HEADER_HEIGHT_DP -
+                            NON_ALPHABET_BOTTOM_SAFE_PADDING_DP
+                    ).coerceAtLeast(120f)
+                Column(
                     modifier =
                         Modifier
                             .fillMaxWidth()
                             .height(keyboardAreaHeightDp.dp),
-                    contentPadding = PaddingValues(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    items(items = gridPoints, key = { it }) { cp ->
-                        val ch = String(Character.toChars(cp))
-                        val borderMod =
-                            if (showKeyBorders) {
-                                Modifier.border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
-                            } else {
-                                Modifier
-                            }
-                        Box(
-                            modifier = borderMod
-                                .clickable {
-                                    haptic()
-                                    flushTransliterationBuffers()
-                                    onGlyphSelected(ch)
+                    // 楔形文字タブはヘッダーを明示表示し、下端のシステムUIと視覚的に重なりにくくする。
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(CUNEIFORM_HEADER_HEIGHT_DP.dp)
+                                .padding(horizontal = 12.dp),
+                        contentAlignment = Alignment.CenterStart,
+                    ) {
+                        Text(
+                            text = cuneiformHeaderLabel,
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(minSize = gridMinCellDp.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(gridHeightDp.dp),
+                        contentPadding =
+                            PaddingValues(
+                                start = 8.dp,
+                                top = 8.dp,
+                                end = 8.dp,
+                                bottom = 8.dp,
+                            ),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        items(items = gridPoints, key = { it }) { cp ->
+                            val ch = String(Character.toChars(cp))
+                            val borderMod =
+                                if (showKeyBorders) {
+                                    Modifier.border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
+                                } else {
+                                    Modifier
                                 }
-                                .height(gridCellHeightDp.dp)
-                                .fillMaxWidth(),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(
-                                text = ch,
-                                style = GridGlyphStyle.copy(color = MaterialTheme.colorScheme.onSurface),
-                            )
+                            Box(
+                                modifier = borderMod
+                                    .clickable {
+                                        haptic()
+                                        flushTransliterationBuffers()
+                                        onGlyphSelected(ch)
+                                    }
+                                    .height(gridCellHeightDp.dp)
+                                    .fillMaxWidth(),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text = ch,
+                                    style = GridGlyphStyle.copy(color = MaterialTheme.colorScheme.onSurface),
+                                )
+                            }
                         }
                     }
+                    // スクロール領域とは独立した固定フッター領域（システムUI重なり回避）
+                    Spacer(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(NON_ALPHABET_BOTTOM_SAFE_PADDING_DP.dp),
+                    )
                 }
             }
         }
